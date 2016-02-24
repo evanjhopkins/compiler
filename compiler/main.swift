@@ -8,5 +8,18 @@
 
 import Foundation
 
-print("Hello, World!")
+func input() -> String {
+    print("[Lexer] <- ", terminator:"")
+    let keyboard = NSFileHandle.fileHandleWithStandardInput()
+    let inputData = keyboard.availableData
+    return NSString(data: inputData, encoding:NSUTF8StringEncoding) as! String
+}
+
+let lexer = Lexer()
+
+let userInput = input()
+
+let tokens: [Token] = lexer.getLexy(userInput)
+
+print(tokens)
 
