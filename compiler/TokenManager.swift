@@ -25,8 +25,15 @@ class TokenManager {
     }
     
     func peekNextToken() -> Token {
-        let nextToken = self.tokens[self.pointer]
+        let nextToken = tokens[pointer]
         return nextToken
+    }
+    
+    func hasNextToken() -> Bool {
+        if pointer+1 == tokens.count{
+            return false
+        }
+        return true
     }
     
     func size() -> Int {

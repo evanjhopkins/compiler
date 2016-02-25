@@ -39,7 +39,7 @@ enum TokenType{
     case LPAREN
     case RPAREN
     case SPACE
-    case OPERATOR
-    case PLUS
+    case BOOLOP
+    case INTOP
     case TYPE
 }

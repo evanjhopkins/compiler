@@ -46,15 +46,10 @@ class Parser: CompilerComponentProtocol {
         parseStatementList(0)
     }
     func parseStatementList(cnt: Int) {
-        if(cnt > tokenManager.size()){
-            Debug.warn("parseStatementList() exceeded size of token list, failure imminent", caller: self)
-            return
+        if tokenManager.hasNextToken() {
+            parseStatement()
+            parseStatementList(cnt+1)
         }
-        
-        parseStatement()
-        parseStatementList(cnt+1)
-        
-        
     }
     
     func parseStatement() {
@@ -94,7 +89,6 @@ class Parser: CompilerComponentProtocol {
     }
     func parseBoolExpr() {
         var token = tokenManager.peekNextToken()
-        print(token.value)
         if token.isType(TokenType.LPAREN) {
             tokenManager.consumeNextToken()
         }else{
@@ -119,7 +113,7 @@ class Parser: CompilerComponentProtocol {
         let token = tokenManager.peekNextToken()
         
         if token.isType(TokenType.DIGIT) {
-            parseDigit()
+            parseIntExpr()
         }
 //        else if token.isType(TokenType.QUOTE) {
 //            //string
@@ -133,8 +127,12 @@ class Parser: CompilerComponentProtocol {
 //        }
     }
     func parseBoolOp() {
-        //let token = tokenManager.getNextToken()
-        
+        let token = tokenManager.peekNextToken()
+        if token.isType(TokenType.BOOLOP){
+            tokenManager.consumeNextToken()
+        }else{
+            Debug.error("Invalid BoolOp", caller: self)
+        }
     }
     func parseIntExpr() {
         
@@ -143,16 +141,16 @@ class Parser: CompilerComponentProtocol {
         
         let token = tokenManager.peekNextToken()
         
-        if token.isType(TokenType.OPERATOR) {
-            parsePlus()
+        if token.isType(TokenType.INTOP) {
+            parseIntOp()
             
             parseExpr()
         }
     }
     
-    func parsePlus() {
+    func parseIntOp() {
         let token = tokenManager.consumeNextToken()
-        if !token.isType(TokenType.PLUS){
+        if !token.isType(TokenType.INTOP){
             Debug.error("Invalid intop", caller: self)
         }
     }
