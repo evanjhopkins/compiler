@@ -44,4 +44,5 @@ enum TokenType{
     case BOOLOP
     case INTOP
     case TYPE
+    case ASSIGN
 }

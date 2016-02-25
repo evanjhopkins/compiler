@@ -11,6 +11,7 @@ import Foundation
 class Lexer: CompilerComponentProtocol{
     var CLASSNAME = "LEXER"
     var VERBOSE = true
+    let debug = Debug.sharedInstance
     
     let patterns:[(type: TokenType, pattern: String)] = [
         (TokenType.IF, "if"),
@@ -27,11 +28,12 @@ class Lexer: CompilerComponentProtocol{
         (TokenType.WHILE, "while"),
         (TokenType.LBRACE, "\\{"),
         (TokenType.RBRACE, "\\}"),
+        (TokenType.ASSIGN, "="),
     ]
     
     func lex(input: String) -> [Token] {
         let tokens: [Token] = getLexy(input)
-        Debug.affirm("Lex completed successfully", caller: self)
+        debug.affirm("Lex completed successfully", caller: self)
         return tokens
     }
     private func getLexy(input: String) -> [Token]{
@@ -56,14 +58,14 @@ class Lexer: CompilerComponentProtocol{
                 //ignore space
                 tokens.append(lastMatch!)
             }
-            Debug.log("\""+lastMatch!.value+"\" --> [" + String(lastMatch!.type) + "]", caller: self)
+            debug.log("\""+lastMatch!.value+"\" --> [" + String(lastMatch!.type) + "]", caller: self)
             tokens += getLexy(lastInput!)
             return tokens
         }
         
         if(input.characters.count > 0 ) {
             substr = string.substringFromIndex(string.startIndex.advancedBy(1))
-            Debug.error("Unrecognized Token: "+String(input.characters.first!), caller: self)
+            debug.error("Unrecognized Token: "+String(input.characters.first!), caller: self)
             tokens += getLexy(substr)
         }
 

@@ -9,26 +9,69 @@
 import Foundation
 
 class Debug{
+    static let sharedInstance = Debug()
+    var log: [JSON] = []
     
-    static func error(message: String, caller: CompilerComponentProtocol) {
-        //errors always log
-        print("[Error]["+caller.CLASSNAME+"] " + message)
+    init(){
+        
     }
     
-    static func warn(message: String, caller: CompilerComponentProtocol) {
-        if caller.VERBOSE {
-            print("[Warn ]["+caller.CLASSNAME+"] " + message)
-        }
+    func error(message: String, caller: CompilerComponentProtocol) {
+        let log = Log(componentName: caller.CLASSNAME, message: message, level: LogLevel.ERROR)
+        self.log.append(log.serialize())
+        //print(log.serialize())
+    }
+    
+    func warn(message: String, caller: CompilerComponentProtocol) {
+        let log = Log(componentName: caller.CLASSNAME, message: message, level: LogLevel.WARN)
+        self.log.append(log.serialize())
+        //print(log.serialize())
     }
 
-    static func log(message: String, caller: CompilerComponentProtocol) {
-        if caller.VERBOSE {
-            print("[Log  ]["+caller.CLASSNAME+"] " + message)
-        }
+    func log(message: String, caller: CompilerComponentProtocol) {
+        let log = Log(componentName: caller.CLASSNAME, message: message, level: LogLevel.LOG)
+        self.log.append(log.serialize())
+        //print(log.serialize())
     }
     
-    static func affirm(message: String, caller: CompilerComponentProtocol) {
-        //affirms always log
-        print("[Affirm]["+caller.CLASSNAME+"] " + message)
+    func affirm(message: String, caller: CompilerComponentProtocol) {
+        let log = Log(componentName: caller.CLASSNAME, message: message, level: LogLevel.AFFIRM)
+        self.log.append(log.serialize())
+        //print(log.serialize())
     }
+    
+    func getSerializedLog() -> String {
+        let json = JSON(self.log)
+        let paramsString = json.rawString(NSUTF8StringEncoding, options: [])
+        return paramsString!
+    }
+}
+
+class Log{
+    let componentName: String
+    let message: String
+    let level: LogLevel
+    
+    init(componentName: String, message: String, level: LogLevel) {
+        self.componentName = componentName
+        self.message = message
+        self.level = level
+    }
+    
+    func serialize() -> JSON {
+        var dict: [String: String] = [String: String]()
+        dict["component"] = componentName
+        dict["message"] = message
+        dict["level"] = String(level)
+        
+        let json = JSON(dict)
+        return json
+    }
+}
+
+enum LogLevel{
+    case AFFIRM
+    case ERROR
+    case WARN
+    case LOG
 }

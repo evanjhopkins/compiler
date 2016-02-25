@@ -10,11 +10,14 @@ import Foundation
 
 let lexer = Lexer()
 
-let userInput = "{ if (v==(2==\"word with space\")) }"
+let userInput = "{ print ( 5 ) }"
 
 let tokens: [Token] = lexer.lex(userInput)
 
 let parser = Parser(tokenss: tokens)
 
 parser.parse()
+
+let debug = Debug.sharedInstance
+print(debug.getSerializedLog())
 

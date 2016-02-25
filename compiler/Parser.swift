@@ -12,6 +12,7 @@ import Foundation
 class Parser: CompilerComponentProtocol {
     var CLASSNAME = "PARSER"
     var VERBOSE = true
+    let debug = Debug.sharedInstance
 
     let tokenManager: TokenManager
     
@@ -21,7 +22,7 @@ class Parser: CompilerComponentProtocol {
     
     func parse() {
         parseBlock()
-        Debug.affirm("Parse completed successfully", caller: self)
+        debug.affirm("Parse completed successfully", caller: self)
     }
     
     func parseBlock() {
@@ -34,7 +35,7 @@ class Parser: CompilerComponentProtocol {
             //consume "{"
             tokenManager.consumeNextToken()
         }else{
-            Debug.error("Invalid block, no opening brace", caller: self)
+            debug.error("Invalid block, no opening brace", caller: self)
         }
         
         parseStatementList()
@@ -44,7 +45,7 @@ class Parser: CompilerComponentProtocol {
             //consume "{"
             tokenManager.consumeNextToken()
         }else{
-            Debug.error("Invalid block, no closing brace", caller: self)
+            debug.error("Invalid block, no closing brace", caller: self)
         }
         
     }
@@ -79,10 +80,40 @@ class Parser: CompilerComponentProtocol {
     }
     
     func parsePrintStatement() {
+        //check for PRINT
+        var token = tokenManager.peekNextToken()
+        if token.isType(TokenType.PRINT) {
+            tokenManager.consumeNextToken()
+        }else{
+            parseTokenError(TokenType.PRINT, got: token)
+        }
+        
+        //check for (
+        token = tokenManager.peekNextToken()
+        if token.isType(TokenType.LPAREN) {
+            tokenManager.consumeNextToken()
+        }else{
+            parseTokenError(TokenType.LPAREN, got: token)
+        }
+        
+        //check for Expr
+        parseExpr()
+        
+        //check for )
+        token = tokenManager.peekNextToken()
+        if token.isType(TokenType.RPAREN) {
+            tokenManager.consumeNextToken()
+        }else{
+            parseTokenError(TokenType.RPAREN, got: token)
+        }
         
     }
     func parseAssignmentStatement() {
+        parseId()
         
+        parseAssign()
+        
+        parseExpr()
     }
     func parseVarDecl() {
         
@@ -134,7 +165,7 @@ class Parser: CompilerComponentProtocol {
         }
         else{
             parseError("Invalid Expression")
-            exit(0)
+            //exit(0)
         }
     }
     func parseBoolOp() {
@@ -195,17 +226,26 @@ class Parser: CompilerComponentProtocol {
             parseTokenError(expectedType, got: token)
         }
     }
+    func parseAssign() {
+        let expectedType = TokenType.ASSIGN
+        let token = tokenManager.peekNextToken()
+        if token.isType(expectedType) {
+            tokenManager.consumeNextToken()
+        }else{
+            parseTokenError(expectedType, got: token)
+        }
+    }
     
     func parseTokenError(expected: TokenType, got: Token) {
-        Debug.error("Expected ["+String(TokenType)+"] got ["+String(got.type)+"] with value '"+got.value+"' on line "+String(got.line), caller: self)
+        debug.error("Expected ["+String(expected)+"] got ["+String(got.type)+"] with value '"+got.value+"' on line "+String(got.line), caller: self)
         failParse()
     }
     func parseError(message: String) {
-        Debug.error(message, caller: self)
+        debug.error(message, caller: self)
         failParse()
     }
     func failParse() {
-        Debug.error("Parser terminating...", caller: self)
+        debug.error("Parser terminating...", caller: self)
         //exit(0)
     }
     
