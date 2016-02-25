@@ -23,13 +23,13 @@ class Debug{
     
     static func warn(message: String, caller: CompilerComponentProtocol) {
         if verbose{
-            print("[Warn]["+caller.CLASSNAME+"] " + message)
+            print("[Warn ]["+caller.CLASSNAME+"] " + message)
         }
     }
 
     static func log(message: String, caller: CompilerComponentProtocol) {
         if verbose{
-            print("[Log]["+caller.CLASSNAME+"] " + message)
+            print("[Log  ]["+caller.CLASSNAME+"] " + message)
         }
     }
 
