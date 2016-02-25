@@ -7,11 +7,11 @@
 //
 
 import Foundation
-import Darwin
+//import Darwin
 
 class Parser: CompilerComponentProtocol {
     var CLASSNAME = "PARSER"
-    var VERBOSE = false
+    var VERBOSE = true
 
     let tokenManager: TokenManager
     
@@ -25,6 +25,10 @@ class Parser: CompilerComponentProtocol {
     }
     
     func parseBlock() {
+        if !tokenManager.hasNextToken() {
+            return
+        }
+        
         var token = tokenManager.peekNextToken()
         if token.isType(TokenType.LBRACE) {
             //consume "{"
@@ -67,6 +71,8 @@ class Parser: CompilerComponentProtocol {
                 parseWhileStatement()
             case TokenType.IF:
                 parseIfStatement()
+            case TokenType.LBRACE:
+                parseBlock()
             default:
                 return
         }
@@ -88,7 +94,7 @@ class Parser: CompilerComponentProtocol {
         //consume "IF"
         tokenManager.consumeNextToken()
         parseBoolExpr()
-        //parseBlock()
+        parseBlock()
     }
     func parseBoolExpr() {
         var token = tokenManager.peekNextToken()
@@ -120,12 +126,13 @@ class Parser: CompilerComponentProtocol {
         else if token.isType(TokenType.STRING) {
             parseString()
         }
-//        }else if token.isType(TokenType.CHAR) {
-//            //id
-//            
+        else if token.isType(TokenType.CHAR) {
+            parseId()
+        }
         else if token.isType(TokenType.LPAREN) {
             parseBoolExpr()
-        }else{
+        }
+        else{
             parseError("Invalid Expression")
             exit(0)
         }
@@ -179,6 +186,15 @@ class Parser: CompilerComponentProtocol {
             parseTokenError(expectedType, got: token)
         }
     }
+    func parseId() {
+        let expectedType = TokenType.CHAR
+        let token = tokenManager.peekNextToken()
+        if token.isType(expectedType) {
+            tokenManager.consumeNextToken()
+        }else{
+            parseTokenError(expectedType, got: token)
+        }
+    }
     
     func parseTokenError(expected: TokenType, got: Token) {
         Debug.error("Expected ["+String(TokenType)+"] got ["+String(got.type)+"] with value '"+got.value+"' on line "+String(got.line), caller: self)
@@ -190,7 +206,7 @@ class Parser: CompilerComponentProtocol {
     }
     func failParse() {
         Debug.error("Parser terminating...", caller: self)
-        exit(0)
+        //exit(0)
     }
     
     

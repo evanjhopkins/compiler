@@ -8,8 +8,9 @@
 
 import Foundation
 
-class TokenManager {
-    
+class TokenManager: CompilerComponentProtocol {
+    let CLASSNAME: String = "TOKEN_MNGR"
+    let VERBOSE: Bool = true
     let tokens: [Token]
     var pointer: Int
     
