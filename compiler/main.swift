@@ -10,7 +10,7 @@ import Foundation
 
 let lexer = Lexer()
 
-let userInput = "{ if (5==(2==\"word\")) }"
+let userInput = "{ if (5==(2==\"word with space\")) }"
 
 let tokens: [Token] = lexer.lex(userInput)
 
