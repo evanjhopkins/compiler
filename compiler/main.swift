@@ -15,7 +15,9 @@ func input() -> String {
     return NSString(data: inputData, encoding:NSUTF8StringEncoding) as! String
 }
 
+
 let lexer = Lexer()
+let parser = Parser()
 
 //let userInput = input()
 
@@ -28,4 +30,6 @@ for token in tokens {
     print(" \""+token.value+"\", ", terminator: "")
 }
 print("]")
+
+parser.parse(tokens)
 

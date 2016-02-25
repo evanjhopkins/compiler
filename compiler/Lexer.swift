@@ -8,7 +8,9 @@
 
 import Foundation
 
-class Lexer {
+class Lexer: CompilerComponentProtocol{
+    var CLASSNAME = "LEXER"
+
     let patterns = [
         (name: "IF", pattern: "if"),
         (name: "DIGIT", pattern: "[0-9]"),
@@ -37,18 +39,18 @@ class Lexer {
                 lastMatch = matchedToken
                 lastInput = input.substringFromIndex(string.startIndex.advancedBy(string.characters.count))
             }
-            
         }
         
         if (lastMatch != nil){
             tokens.append(lastMatch!)
-            print("\""+lastMatch!.value+"\" -> " + lastMatch!.type)
+            Debug.log("\""+lastMatch!.value+"\" --> [" + lastMatch!.type + "]", caller: self)
             tokens += getLexy(lastInput!)
             return tokens
         }
         
         if(input.characters.count > 0 ) {
             substr = string.substringFromIndex(string.startIndex.advancedBy(1))
+            Debug.error("Unrecognized Token: "+String(input.characters.first!), caller: self)
             tokens += getLexy(substr)
         }
 
