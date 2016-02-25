@@ -17,9 +17,15 @@ func input() -> String {
 
 let lexer = Lexer()
 
-let userInput = input()
+//let userInput = input()
+
+let userInput = "if ! (5 + \"word\")"
 
 let tokens: [Token] = lexer.getLexy(userInput)
 
-print(tokens)
+print("[ ", terminator: "")
+for token in tokens {
+    print(" \""+token.value+"\", ", terminator: "")
+}
+print("]")
 

@@ -11,10 +11,12 @@ import Foundation
 class Token {
 
     var value: String
+    var type: String
     var lineNum: Int
     
-    init() {
-        value = "val"
+    init(value: String, type: String) {
+        self.value = value
+        self.type = type
         lineNum = 0
     }
     
