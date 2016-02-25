@@ -10,7 +10,7 @@ import Foundation
 
 let lexer = Lexer()
 
-let userInput = "{ if (5==8) }"
+let userInput = "{ if (5==(2==+) }"
 
 let tokens: [Token] = lexer.getLexy(userInput)
 

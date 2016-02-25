@@ -12,6 +12,8 @@ class Token {
 
     var value: String
     var type: TokenType
+    //not tracking line num yet
+    var line: Int = 0
     
     init(value: String, type: TokenType) {
         self.value = value

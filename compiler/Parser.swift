@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Darwin
 
 class Parser: CompilerComponentProtocol {
     var CLASSNAME = "PARSER"
@@ -19,6 +20,7 @@ class Parser: CompilerComponentProtocol {
     
     func parse() {
         parseBlock()
+        Debug.log("Parse completed successfully", caller: self)
     }
     
     func parseBlock() {
@@ -92,7 +94,7 @@ class Parser: CompilerComponentProtocol {
         if token.isType(TokenType.LPAREN) {
             tokenManager.consumeNextToken()
         }else{
-            Debug.error("Invalid bool expr, no opening paren", caller: self)
+            parseError("Invalid bool expr, no opening paren")
         }
         
         parseExpr()
@@ -105,8 +107,7 @@ class Parser: CompilerComponentProtocol {
         if token.isType(TokenType.RPAREN) {
             tokenManager.consumeNextToken()
         }else{
-            Debug.error("Invalid bool expr, no closing paren", caller: self)
-            
+            parseError("Invalid bool expr, no closing paren")
         }
     }
     func parseExpr() {
@@ -115,23 +116,25 @@ class Parser: CompilerComponentProtocol {
         if token.isType(TokenType.DIGIT) {
             parseIntExpr()
         }
-//        else if token.isType(TokenType.QUOTE) {
-//            //string
-//            
+        else if token.isType(TokenType.STRING) {
+            parseString()
+        }
 //        }else if token.isType(TokenType.CHAR) {
 //            //id
 //            
-//        }else if token.isType(TokenType.LPAREN) {
-//            //bool
-//        
-//        }
+        else if token.isType(TokenType.LPAREN) {
+            parseBoolExpr()
+        }else{
+            parseError("Invalid Expression")
+            exit(0)
+        }
     }
     func parseBoolOp() {
         let token = tokenManager.peekNextToken()
         if token.isType(TokenType.BOOLOP){
             tokenManager.consumeNextToken()
         }else{
-            Debug.error("Invalid BoolOp", caller: self)
+            parseError("Invalid BoolOp")
         }
     }
     func parseIntExpr() {
@@ -149,17 +152,44 @@ class Parser: CompilerComponentProtocol {
     }
     
     func parseIntOp() {
-        let token = tokenManager.consumeNextToken()
-        if !token.isType(TokenType.INTOP){
-            Debug.error("Invalid intop", caller: self)
+        let expectedType = TokenType.INTOP
+        let token = tokenManager.peekNextToken()
+        if token.isType(expectedType) {
+            tokenManager.consumeNextToken()
+        }else{
+            parseTokenError(expectedType, got: token)
+        }
+    }
+    func parseDigit() {
+        let expectedType = TokenType.DIGIT
+        let token = tokenManager.peekNextToken()
+        if token.isType(expectedType) {
+            tokenManager.consumeNextToken()
+        }else{
+            parseTokenError(expectedType, got: token)
+        }
+    }
+    func parseString() {
+        let expectedType = TokenType.STRING
+        let token = tokenManager.peekNextToken()
+        if token.isType(expectedType) {
+            tokenManager.consumeNextToken()
+        }else{
+            parseTokenError(expectedType, got: token)
         }
     }
     
-    func parseDigit() {
-        let token = tokenManager.consumeNextToken()
-        if !token.isType(TokenType.DIGIT){
-            Debug.error("Invalid digit", caller: self)
-        }
+    func parseTokenError(expected: TokenType, got: Token) {
+        Debug.error("Expected ["+String(TokenType)+"] got ["+String(got.type)+"] with value '"+got.value+"' on line "+String(got.line), caller: self)
+        failParse()
+    }
+    func parseError(message: String) {
+        Debug.error(message, caller: self)
+        failParse()
+    }
+    func failParse() {
+        Debug.error("Parser terminating...", caller: self)
+        exit(0)
     }
     
     
