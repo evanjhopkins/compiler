@@ -10,7 +10,8 @@ import Foundation
 
 class Lexer: CompilerComponentProtocol{
     var CLASSNAME = "LEXER"
-
+    var VERBOSE = false
+    
     let patterns:[(type: TokenType, pattern: String)] = [
         (TokenType.IF, "if"),
         (TokenType.DIGIT, "[0-9]"),
@@ -19,7 +20,7 @@ class Lexer: CompilerComponentProtocol{
         (TokenType.LPAREN, "\\("),
         (TokenType.RPAREN, "\\)"),
         (TokenType.BOOLOP, "==|!="),
-       // (TokenType.SPACE, " "),
+      //(TokenType.SPACE, " "),
         (TokenType.INTOP, "\\+"),
         (TokenType.TYPE, "int|string|boolean"),
         (TokenType.CHAR, "[a-zA-Z]"),
@@ -27,8 +28,13 @@ class Lexer: CompilerComponentProtocol{
         (TokenType.LBRACE, "\\{"),
         (TokenType.RBRACE, "\\}"),
     ]
-
-    func getLexy(input: String) -> [Token]{
+    
+    func lex(input: String) -> [Token] {
+        let tokens: [Token] = getLexy(input)
+        Debug.affirm("Lex completed successfully", caller: self)
+        return tokens
+    }
+    private func getLexy(input: String) -> [Token]{
         
         var string: String = ""
         var tokens: [Token] = []

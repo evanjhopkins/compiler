@@ -11,7 +11,8 @@ import Darwin
 
 class Parser: CompilerComponentProtocol {
     var CLASSNAME = "PARSER"
-    
+    var VERBOSE = false
+
     let tokenManager: TokenManager
     
     init(tokenss: [Token]) {
@@ -20,7 +21,7 @@ class Parser: CompilerComponentProtocol {
     
     func parse() {
         parseBlock()
-        Debug.log("Parse completed successfully", caller: self)
+        Debug.affirm("Parse completed successfully", caller: self)
     }
     
     func parseBlock() {

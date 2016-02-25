@@ -9,29 +9,26 @@
 import Foundation
 
 class Debug{
-    static let verbose: Bool = true
-    
-    init(verbose: Bool) {
-       // self.verbose = verbose
-    }
     
     static func error(message: String, caller: CompilerComponentProtocol) {
-        if verbose{
-            print("[Error]["+caller.CLASSNAME+"] " + message)
-        }
+        //errors always log
+        print("[Error]["+caller.CLASSNAME+"] " + message)
     }
     
     static func warn(message: String, caller: CompilerComponentProtocol) {
-        if verbose{
+        if caller.VERBOSE {
             print("[Warn ]["+caller.CLASSNAME+"] " + message)
         }
     }
 
     static func log(message: String, caller: CompilerComponentProtocol) {
-        if verbose{
+        if caller.VERBOSE {
             print("[Log  ]["+caller.CLASSNAME+"] " + message)
         }
     }
-
     
+    static func affirm(message: String, caller: CompilerComponentProtocol) {
+        //affirms always log
+        print("[Affirm]["+caller.CLASSNAME+"] " + message)
+    }
 }

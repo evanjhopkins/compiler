@@ -10,9 +10,9 @@ import Foundation
 
 let lexer = Lexer()
 
-let userInput = "{ if (5==(2==+) }"
+let userInput = "{ if (5==(2==\"word\")) }"
 
-let tokens: [Token] = lexer.getLexy(userInput)
+let tokens: [Token] = lexer.lex(userInput)
 
 let parser = Parser(tokenss: tokens)
 

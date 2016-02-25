@@ -10,4 +10,5 @@ import Foundation
 
 protocol CompilerComponentProtocol {
     var CLASSNAME: String {get}
+    var VERBOSE: Bool {get}
 }
