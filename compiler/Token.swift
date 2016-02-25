@@ -11,17 +11,35 @@ import Foundation
 class Token {
 
     var value: String
-    var type: String
-    var lineNum: Int
+    var type: TokenType
     
-    init(value: String, type: String) {
+    init(value: String, type: TokenType) {
         self.value = value
         self.type = type
-        lineNum = 0
     }
     
-    func extend(extendee: String) {
-        value = value + extendee
+    func isType(type: TokenType) -> Bool {
+        if self.type == type{
+            return true
+        }
+        return false
     }
-    
+
+}
+
+enum TokenType{
+    case LBRACE
+    case RBRACE
+    case DIGIT
+    case CHAR
+    case IF
+    case WHILE
+    case STRING
+    case PRINT
+    case LPAREN
+    case RPAREN
+    case SPACE
+    case OPERATOR
+    case PLUS
+    case TYPE
 }
