@@ -17,19 +17,18 @@ func input() -> String {
 
 
 let lexer = Lexer()
-let parser = Parser()
 
-//let userInput = input()
-
-let userInput = "if ! (5 + \"word\")"
+let userInput = "{ if (5==5) }"
 
 let tokens: [Token] = lexer.getLexy(userInput)
 
-print("[ ", terminator: "")
-for token in tokens {
-    print(" \""+token.value+"\", ", terminator: "")
-}
-print("]")
+let parser = Parser(tokenss: tokens)
 
-parser.parse(tokens)
+//print("[ ", terminator: "")
+//for token in tokens {
+//    print(" \""+token.value+"\", ", terminator: "")
+//}
+//print("]")
+
+parser.parse()
 

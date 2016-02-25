@@ -13,6 +13,7 @@
 		E1D088671C7EA12A003430E7 /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1D088661C7EA12A003430E7 /* Parser.swift */; };
 		E1D088691C7EAA46003430E7 /* Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1D088681C7EAA46003430E7 /* Debug.swift */; };
 		E1D0886B1C7EAD26003430E7 /* CompilerComponentProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1D0886A1C7EAD26003430E7 /* CompilerComponentProtocol.swift */; };
+		E1D0886D1C7EBF17003430E7 /* TokenManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1D0886C1C7EBF17003430E7 /* TokenManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -36,6 +37,7 @@
 		E1D088661C7EA12A003430E7 /* Parser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
 		E1D088681C7EAA46003430E7 /* Debug.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Debug.swift; sourceTree = "<group>"; };
 		E1D0886A1C7EAD26003430E7 /* CompilerComponentProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CompilerComponentProtocol.swift; sourceTree = "<group>"; };
+		E1D0886C1C7EBF17003430E7 /* TokenManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TokenManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +77,7 @@
 				E1D0886A1C7EAD26003430E7 /* CompilerComponentProtocol.swift */,
 				E1D088661C7EA12A003430E7 /* Parser.swift */,
 				E1D088681C7EAA46003430E7 /* Debug.swift */,
+				E1D0886C1C7EBF17003430E7 /* TokenManager.swift */,
 			);
 			path = compiler;
 			sourceTree = "<group>";
@@ -142,6 +145,7 @@
 				E1D088621C7D2744003430E7 /* Token.swift in Sources */,
 				E1D088641C7E6B0D003430E7 /* Lexer.swift in Sources */,
 				E122B6961C5A7563007E3273 /* main.swift in Sources */,
+				E1D0886D1C7EBF17003430E7 /* TokenManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
