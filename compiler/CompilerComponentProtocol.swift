@@ -10,5 +10,4 @@ import Foundation
 
 protocol CompilerComponentProtocol {
     var CLASSNAME: String {get}
-
 }
