@@ -11,17 +11,22 @@ import Foundation
 class Lexer: CompilerComponentProtocol{
     var CLASSNAME = "LEXER"
 
-    let patterns = [
-        (name: "IF", pattern: "if"),
-        (name: "DIGIT", pattern: "[0-9]"),
-        (name: "STRING", pattern: "\"+[a-zA-Z0-9]+\""),
-        (name: "PAREN", pattern: "\\(|\\)"),
-        (name: "EQUALITY", pattern: "==|!="),
-        (name: "SPACE", pattern: " "),
-        (name: "ADDITION", pattern: "\\+"),
-        (name: "TYPE", pattern: "int|string|boolean"),
-        (name: "ADDITION", pattern: "\\+"),
-        (name: "CHAR", pattern: "[a-zA-Z]"),
+    let patterns:[(type: TokenType, pattern: String)] = [
+        (TokenType.IF, "if"),
+        (TokenType.DIGIT, "[0-9]"),
+        (TokenType.STRING, "\"+[a-zA-Z0-9]+\""),
+        (TokenType.PRINT, "print"),
+        (TokenType.LPAREN, "\\("),
+        (TokenType.RPAREN, "\\)"),
+        (TokenType.OPERATOR, "==|!="),
+       // (TokenType.SPACE, " "),
+        (TokenType.PLUS, "\\+"),
+        (TokenType.TYPE, "int|string|boolean"),
+        (TokenType.PLUS, "\\+"),
+        (TokenType.CHAR, "[a-zA-Z]"),
+        (TokenType.WHILE, "while"),
+        (TokenType.LBRACE, "\\{"),
+        (TokenType.RBRACE, "\\}"),
     ]
 
     func getLexy(input: String) -> [Token]{
@@ -43,7 +48,7 @@ class Lexer: CompilerComponentProtocol{
         
         if (lastMatch != nil){
             tokens.append(lastMatch!)
-            Debug.log("\""+lastMatch!.value+"\" --> [" + lastMatch!.type + "]", caller: self)
+            Debug.log("\""+lastMatch!.value+"\" --> [" + String(lastMatch!.type) + "]", caller: self)
             tokens += getLexy(lastInput!)
             return tokens
         }
@@ -61,7 +66,7 @@ class Lexer: CompilerComponentProtocol{
         //print("\""+string+"\"")
         for pattern in patterns {
             if string.rangeOfString(pattern.pattern, options: .RegularExpressionSearch) == string.characters.indices {
-                return Token(value: string, type: pattern.name)
+                return Token(value: string, type: pattern.type)
             }
         }
         return nil
