@@ -16,36 +16,42 @@ class Parser: CompilerComponentProtocol {
 
     let tokenManager: TokenManager
     
-    init(tokenss: [Token]) {
-        self.tokenManager = TokenManager(tokens: tokenss)
+    init(tokens: [Token]) {
+        self.tokenManager = TokenManager(tokens: tokens)
+    }
+    
+    
+    //given a token and an expected token type, return true if token is the expected type
+    func matchAndConsume(expectedType: TokenType, token: Token) -> Bool {
+        if token.isType(expectedType) {
+            tokenManager.consumeNextToken()
+            return true
+        }else{
+            debug.error("Expected ["+String(expectedType)+"] got ["+String(token.type)+"] with value '"+token.value+"' on line "+String(token.line), caller: self)
+            return false
+        }
     }
     
     func parse() {
         parseBlock()
+        
+        
         debug.affirm("Parse completed successfully", caller: self)
     }
     
     func parseBlock() {
-        if !tokenManager.hasNextToken() {
-            return
-        }
+//        if !tokenManager.hasNextToken() {
+//            return
+//        }
         
-        var token = tokenManager.peekNextToken()
-        if token.isType(TokenType.LBRACE) {
-            //consume "{"
-            tokenManager.consumeNextToken()
-        }else{
-            debug.error("Invalid block, no opening brace", caller: self)
+        if !matchAndConsume(TokenType.LBRACE, token: tokenManager.peekNextToken()){
+            return
         }
         
         parseStatementList()
         
-        token = tokenManager.peekNextToken()
-        if token.isType(TokenType.RBRACE) {
-            //consume "{"
-            tokenManager.consumeNextToken()
-        }else{
-            debug.error("Invalid block, no closing brace", caller: self)
+        if !matchAndConsume(TokenType.RBRACE, token: tokenManager.peekNextToken()){
+            return
         }
         
     }
@@ -62,7 +68,6 @@ class Parser: CompilerComponentProtocol {
     
     func parseStatement() {
         let token = tokenManager.peekNextToken()
-        
         switch(token.type){
             case TokenType.PRINT:
                 parsePrintStatement()
@@ -81,44 +86,55 @@ class Parser: CompilerComponentProtocol {
     
     func parsePrintStatement() {
         //check for PRINT
-        var token = tokenManager.peekNextToken()
-        if token.isType(TokenType.PRINT) {
-            tokenManager.consumeNextToken()
-        }else{
-            parseTokenError(TokenType.PRINT, got: token)
+        if !matchAndConsume(TokenType.PRINT, token: tokenManager.peekNextToken()){
+            return
         }
         
         //check for (
-        token = tokenManager.peekNextToken()
-        if token.isType(TokenType.LPAREN) {
-            tokenManager.consumeNextToken()
-        }else{
-            parseTokenError(TokenType.LPAREN, got: token)
+        if !matchAndConsume(TokenType.LPAREN, token: tokenManager.peekNextToken()){
+            return
         }
         
         //check for Expr
         parseExpr()
         
         //check for )
-        token = tokenManager.peekNextToken()
-        if token.isType(TokenType.RPAREN) {
-            tokenManager.consumeNextToken()
-        }else{
-            parseTokenError(TokenType.RPAREN, got: token)
+        if !matchAndConsume(TokenType.RPAREN, token: tokenManager.peekNextToken()){
+            return
         }
         
     }
     func parseAssignmentStatement() {
-        parseId()
+        //id
+        if !matchAndConsume(TokenType.CHAR, token: tokenManager.peekNextToken()){
+            return
+        }
         
-        parseAssign()
+        if !matchAndConsume(TokenType.ASSIGN, token: tokenManager.peekNextToken()){
+            return
+        }
         
         parseExpr()
     }
     func parseVarDecl() {
+        if !matchAndConsume(TokenType.TYPE, token: tokenManager.peekNextToken()){
+            return
+        }
         
+        //id
+        if !matchAndConsume(TokenType.CHAR, token: tokenManager.peekNextToken()){
+            return
+        }
     }
+
     func parseWhileStatement() {
+        if !matchAndConsume(TokenType.WHILE, token: tokenManager.peekNextToken()){
+            return
+        }
+        
+        parseBoolExpr()
+        
+        parseBlock()
         
     }
     func parseIfStatement() {
@@ -128,24 +144,20 @@ class Parser: CompilerComponentProtocol {
         parseBlock()
     }
     func parseBoolExpr() {
-        var token = tokenManager.peekNextToken()
-        if token.isType(TokenType.LPAREN) {
-            tokenManager.consumeNextToken()
-        }else{
-            parseError("Invalid bool expr, no opening paren")
+        if !matchAndConsume(TokenType.LPAREN, token: tokenManager.peekNextToken()){
+            return
         }
         
         parseExpr()
         
-        parseBoolOp()
+        if !matchAndConsume(TokenType.BOOLOP, token: tokenManager.peekNextToken()){
+            return
+        }
         
         parseExpr()
         
-        token = tokenManager.peekNextToken()
-        if token.isType(TokenType.RPAREN) {
-            tokenManager.consumeNextToken()
-        }else{
-            parseError("Invalid bool expr, no closing paren")
+        if !matchAndConsume(TokenType.RPAREN, token: tokenManager.peekNextToken()){
+            return
         }
     }
     func parseExpr() {
@@ -155,99 +167,38 @@ class Parser: CompilerComponentProtocol {
             parseIntExpr()
         }
         else if token.isType(TokenType.STRING) {
-            parseString()
+            if !matchAndConsume(TokenType.STRING, token: tokenManager.peekNextToken()){
+                return
+            }
         }
         else if token.isType(TokenType.CHAR) {
-            parseId()
+            if !matchAndConsume(TokenType.LBRACE, token: tokenManager.peekNextToken()){
+                return
+            }
         }
         else if token.isType(TokenType.LPAREN) {
             parseBoolExpr()
         }
         else{
-            parseError("Invalid Expression")
-            //exit(0)
+            print("Invalid Expression")
+            return
         }
     }
-    func parseBoolOp() {
-        let token = tokenManager.peekNextToken()
-        if token.isType(TokenType.BOOLOP){
-            tokenManager.consumeNextToken()
-        }else{
-            parseError("Invalid BoolOp")
-        }
-    }
+
     func parseIntExpr() {
         
-        //if this function was routed to, then we already know the next token is a digit
-        parseDigit()
+        if !matchAndConsume(TokenType.DIGIT, token: tokenManager.peekNextToken()){
+            return
+        }
         
         let token = tokenManager.peekNextToken()
         
         if token.isType(TokenType.INTOP) {
-            parseIntOp()
+            if !matchAndConsume(TokenType.INTOP, token: tokenManager.peekNextToken()){
+                return
+            }
             
             parseExpr()
         }
     }
-    
-    func parseIntOp() {
-        let expectedType = TokenType.INTOP
-        let token = tokenManager.peekNextToken()
-        if token.isType(expectedType) {
-            tokenManager.consumeNextToken()
-        }else{
-            parseTokenError(expectedType, got: token)
-        }
-    }
-    func parseDigit() {
-        let expectedType = TokenType.DIGIT
-        let token = tokenManager.peekNextToken()
-        if token.isType(expectedType) {
-            tokenManager.consumeNextToken()
-        }else{
-            parseTokenError(expectedType, got: token)
-        }
-    }
-    func parseString() {
-        let expectedType = TokenType.STRING
-        let token = tokenManager.peekNextToken()
-        if token.isType(expectedType) {
-            tokenManager.consumeNextToken()
-        }else{
-            parseTokenError(expectedType, got: token)
-        }
-    }
-    func parseId() {
-        let expectedType = TokenType.CHAR
-        let token = tokenManager.peekNextToken()
-        if token.isType(expectedType) {
-            tokenManager.consumeNextToken()
-        }else{
-            parseTokenError(expectedType, got: token)
-        }
-    }
-    func parseAssign() {
-        let expectedType = TokenType.ASSIGN
-        let token = tokenManager.peekNextToken()
-        if token.isType(expectedType) {
-            tokenManager.consumeNextToken()
-        }else{
-            parseTokenError(expectedType, got: token)
-        }
-    }
-    
-    func parseTokenError(expected: TokenType, got: Token) {
-        debug.error("Expected ["+String(expected)+"] got ["+String(got.type)+"] with value '"+got.value+"' on line "+String(got.line), caller: self)
-        failParse()
-    }
-    func parseError(message: String) {
-        debug.error(message, caller: self)
-        failParse()
-    }
-    func failParse() {
-        debug.error("Parser terminating...", caller: self)
-        //exit(0)
-    }
-    
-    
 }

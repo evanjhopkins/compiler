@@ -14,10 +14,10 @@ let userInput = "{ print ( 5 ) }"
 
 let tokens: [Token] = lexer.lex(userInput)
 
-let parser = Parser(tokenss: tokens)
+let parser = Parser(tokens: tokens)
 
 parser.parse()
 
 let debug = Debug.sharedInstance
-print(debug.getSerializedLog())
+//print(debug.getSerializedLog())
 

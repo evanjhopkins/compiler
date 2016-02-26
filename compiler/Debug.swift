@@ -19,25 +19,25 @@ class Debug{
     func error(message: String, caller: CompilerComponentProtocol) {
         let log = Log(componentName: caller.CLASSNAME, message: message, level: LogLevel.ERROR)
         self.log.append(log.serialize())
-        //print(log.serialize())
+        log.display()
     }
     
     func warn(message: String, caller: CompilerComponentProtocol) {
         let log = Log(componentName: caller.CLASSNAME, message: message, level: LogLevel.WARN)
         self.log.append(log.serialize())
-        //print(log.serialize())
+        log.display()
     }
 
     func log(message: String, caller: CompilerComponentProtocol) {
         let log = Log(componentName: caller.CLASSNAME, message: message, level: LogLevel.LOG)
         self.log.append(log.serialize())
-        //print(log.serialize())
+        log.display()
     }
     
     func affirm(message: String, caller: CompilerComponentProtocol) {
         let log = Log(componentName: caller.CLASSNAME, message: message, level: LogLevel.AFFIRM)
         self.log.append(log.serialize())
-        //print(log.serialize())
+        log.display()
     }
     
     func getSerializedLog() -> String {
@@ -66,6 +66,9 @@ class Log{
         
         let json = JSON(dict)
         return json
+    }
+    func display() {
+        print(componentName + ": "+message)
     }
 }
 
