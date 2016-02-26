@@ -21,7 +21,7 @@ class Lexer: CompilerComponentProtocol{
         (TokenType.LPAREN, "\\("),
         (TokenType.RPAREN, "\\)"),
         (TokenType.BOOLOP, "==|!="),
-        (TokenType.SPACE, " "),
+        (TokenType.SPACE, " |^\n|\\t"),
         (TokenType.INTOP, "\\+"),
         (TokenType.TYPE, "int|string|boolean"),
         (TokenType.CHAR, "[a-zA-Z]"),

@@ -34,7 +34,7 @@ class TokenManager: CompilerComponentProtocol {
     }
     
     func hasNextToken() -> Bool {
-        if pointer+1 >= tokens.count{
+        if pointer >= tokens.count{
             return false
         }
         return true
