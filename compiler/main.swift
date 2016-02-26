@@ -10,9 +10,17 @@ import Foundation
 
 let lexer = Lexer()
 
-let userInput = "{{     print ( 5 ) }}$"
+func input() -> String {
+    let keyboard = NSFileHandle.fileHandleWithStandardInput()
+    let inputData = keyboard.availableData
+    return NSString(data: inputData, encoding: NSUTF8StringEncoding) as! String
+}
 
-let tokens: [Token] = lexer.lex(userInput)
+print("Please paste source:")
+let source = input()
+print("\(source)")
+
+let tokens: [Token] = lexer.lex(source)
 
 let parser = Parser(tokens: tokens)
 
