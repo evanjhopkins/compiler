@@ -10,7 +10,7 @@ import Foundation
 
 let lexer = Lexer()
 
-let userInput = "{ print ( 5 ) }"
+let userInput = "{{ print ( 5 ) }}$"
 
 let tokens: [Token] = lexer.lex(userInput)
 

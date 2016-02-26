@@ -25,13 +25,16 @@ class TokenManager: CompilerComponentProtocol {
         return nextToken
     }
     
-    func peekNextToken() -> Token {
+    func peekNextToken() -> Token? {
+        if !hasNextToken(){
+            return nil
+        }
         let nextToken = tokens[pointer]
         return nextToken
     }
     
     func hasNextToken() -> Bool {
-        if pointer+1 == tokens.count{
+        if pointer+1 >= tokens.count{
             return false
         }
         return true

@@ -45,4 +45,5 @@ enum TokenType{
     case INTOP
     case TYPE
     case ASSIGN
+    case EOL
 }

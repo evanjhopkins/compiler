@@ -22,12 +22,16 @@ class Parser: CompilerComponentProtocol {
     
     
     //given a token and an expected token type, return true if token is the expected type
-    func matchAndConsume(expectedType: TokenType, token: Token) -> Bool {
-        if token.isType(expectedType) {
+    func matchAndConsume(expectedType: TokenType, token: Token?) -> Bool {
+        if token == nil{
+            debug.error("Expected ["+String(expectedType)+"] but no tokens remain", caller: self)
+            return false
+        }
+        if token!.isType(expectedType) {
             tokenManager.consumeNextToken()
             return true
         }else{
-            debug.error("Expected ["+String(expectedType)+"] got ["+String(token.type)+"] with value '"+token.value+"' on line "+String(token.line), caller: self)
+            debug.error("Expected ["+String(expectedType)+"] got ["+String(token!.type)+"] with value '"+token!.value+"' on line "+String(token!.line), caller: self)
             return false
         }
     }
@@ -35,170 +39,202 @@ class Parser: CompilerComponentProtocol {
     func parse() {
         parseBlock()
         
+        if !matchAndConsume(TokenType.EOL, token: tokenManager.peekNextToken()){
+            return
+        }
         
         debug.affirm("Parse completed successfully", caller: self)
     }
     
-    func parseBlock() {
-//        if !tokenManager.hasNextToken() {
-//            return
-//        }
+    func parseBlock() -> Bool {
         
         if !matchAndConsume(TokenType.LBRACE, token: tokenManager.peekNextToken()){
-            return
+            return false
         }
         
         parseStatementList()
         
         if !matchAndConsume(TokenType.RBRACE, token: tokenManager.peekNextToken()){
-            return
+            return false
+        }
+        return true
+    }
+    
+    func parseStatementList() -> Bool {
+        if !parseStatement(){
+            return false
         }
         
-    }
-    
-    func parseStatementList() {
-        parseStatementList(0)
-    }
-    func parseStatementList(cnt: Int) {
         if tokenManager.hasNextToken() {
-            parseStatement()
-            parseStatementList(cnt+1)
+            if !parseStatementList(){
+                return false
+            }
         }
+        return true
     }
     
-    func parseStatement() {
+    func parseStatement() -> Bool {
         let token = tokenManager.peekNextToken()
-        switch(token.type){
+        switch(token!.type){
             case TokenType.PRINT:
-                parsePrintStatement()
+                return parsePrintStatement()
             case TokenType.TYPE:
-                parseVarDecl()
+                return parseVarDecl()
             case TokenType.WHILE:
-                parseWhileStatement()
+                return parseWhileStatement()
+            case TokenType.ASSIGN:
+                return parseAssignmentStatement()
             case TokenType.IF:
-                parseIfStatement()
+                return parseIfStatement()
             case TokenType.LBRACE:
-                parseBlock()
+                return parseBlock()
             default:
-                return
+                return false
         }
     }
     
-    func parsePrintStatement() {
+    func parsePrintStatement() -> Bool {
         //check for PRINT
         if !matchAndConsume(TokenType.PRINT, token: tokenManager.peekNextToken()){
-            return
+            return false
         }
         
         //check for (
         if !matchAndConsume(TokenType.LPAREN, token: tokenManager.peekNextToken()){
-            return
+            return false
         }
         
         //check for Expr
-        parseExpr()
+        if !(parseExpr()){
+            return false
+        }
         
         //check for )
         if !matchAndConsume(TokenType.RPAREN, token: tokenManager.peekNextToken()){
-            return
+            return false
         }
+        return true
         
     }
-    func parseAssignmentStatement() {
+    func parseAssignmentStatement() -> Bool {
         //id
         if !matchAndConsume(TokenType.CHAR, token: tokenManager.peekNextToken()){
-            return
+            return false
         }
         
         if !matchAndConsume(TokenType.ASSIGN, token: tokenManager.peekNextToken()){
-            return
+            return false
         }
         
-        parseExpr()
+        if !parseExpr(){
+            return false
+        }
+        return true
     }
-    func parseVarDecl() {
+    func parseVarDecl() -> Bool {
         if !matchAndConsume(TokenType.TYPE, token: tokenManager.peekNextToken()){
-            return
+            return false
         }
         
         //id
         if !matchAndConsume(TokenType.CHAR, token: tokenManager.peekNextToken()){
-            return
+            return false
         }
+        return true
     }
 
-    func parseWhileStatement() {
+    func parseWhileStatement() -> Bool {
         if !matchAndConsume(TokenType.WHILE, token: tokenManager.peekNextToken()){
-            return
+            return false
         }
         
-        parseBoolExpr()
+        if !parseBoolExpr(){
+            return false
+        }
         
-        parseBlock()
-        
+        if !parseBlock(){
+            return false
+        }
+        return true
     }
-    func parseIfStatement() {
+    func parseIfStatement() -> Bool {
         //consume "IF"
         tokenManager.consumeNextToken()
-        parseBoolExpr()
-        parseBlock()
-    }
-    func parseBoolExpr() {
-        if !matchAndConsume(TokenType.LPAREN, token: tokenManager.peekNextToken()){
-            return
+        if !parseBoolExpr(){
+            return false
         }
         
-        parseExpr()
+        if !parseBlock(){
+            return false
+        }
+        return true
+    }
+    func parseBoolExpr() -> Bool {
+        if !matchAndConsume(TokenType.LPAREN, token: tokenManager.peekNextToken()){
+            return false
+        }
+        
+        if !parseExpr() {
+            return false
+        }
         
         if !matchAndConsume(TokenType.BOOLOP, token: tokenManager.peekNextToken()){
-            return
+            return false
         }
         
-        parseExpr()
+        if !parseExpr() {
+            return false
+        }
         
         if !matchAndConsume(TokenType.RPAREN, token: tokenManager.peekNextToken()){
-            return
+            return false
         }
+        return true
     }
-    func parseExpr() {
+    func parseExpr() -> Bool {
         let token = tokenManager.peekNextToken()
         
-        if token.isType(TokenType.DIGIT) {
-            parseIntExpr()
+        if token!.isType(TokenType.DIGIT) {
+            return parseIntExpr()
         }
-        else if token.isType(TokenType.STRING) {
+        else if token!.isType(TokenType.STRING) {
             if !matchAndConsume(TokenType.STRING, token: tokenManager.peekNextToken()){
-                return
+                return false
             }
+            return true
         }
-        else if token.isType(TokenType.CHAR) {
+        else if token!.isType(TokenType.CHAR) {
             if !matchAndConsume(TokenType.LBRACE, token: tokenManager.peekNextToken()){
-                return
+                return false
             }
+            return true
         }
-        else if token.isType(TokenType.LPAREN) {
-            parseBoolExpr()
+        else if token!.isType(TokenType.LPAREN) {
+            return parseBoolExpr()
         }
         else{
             print("Invalid Expression")
-            return
+            return false
         }
     }
 
-    func parseIntExpr() {
+    func parseIntExpr() -> Bool {
         
         if !matchAndConsume(TokenType.DIGIT, token: tokenManager.peekNextToken()){
-            return
+            return false
         }
         
         let token = tokenManager.peekNextToken()
         
-        if token.isType(TokenType.INTOP) {
+        if token!.isType(TokenType.INTOP) {
             if !matchAndConsume(TokenType.INTOP, token: tokenManager.peekNextToken()){
-                return
+                return false
             }
             
-            parseExpr()
+            if !parseExpr(){
+                return false
+            }
         }
+        return true
     }
 }

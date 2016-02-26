@@ -29,6 +29,7 @@ class Lexer: CompilerComponentProtocol{
         (TokenType.LBRACE, "\\{"),
         (TokenType.RBRACE, "\\}"),
         (TokenType.ASSIGN, "="),
+        (TokenType.EOL, "\\$")
     ]
     
     func lex(input: String) -> [Token] {
