@@ -10,6 +10,8 @@ import Foundation
 
 let lexer = Lexer()
 
+
+
 func input() -> String {
     let keyboard = NSFileHandle.fileHandleWithStandardInput()
     let inputData = keyboard.availableData
@@ -27,5 +29,4 @@ let parser = Parser(tokens: tokens)
 parser.parse()
 
 let debug = Debug.sharedInstance
-//print(debug.getSerializedLog())
-
+    

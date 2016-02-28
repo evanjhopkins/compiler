@@ -37,13 +37,23 @@ class Parser: CompilerComponentProtocol {
     }
     
     func parse() {
-        parseBlock()
-        
-        if !matchAndConsume(TokenType.EOL, token: tokenManager.peekNextToken()){
-            return
+        if parseProgram(){
+            debug.affirm("Parse completed successfully", caller: self)
+        }
+        else{
+            debug.error("Parse failed", caller: self)
+        }
+    }
+    
+    func parseProgram() -> Bool {
+        if !parseBlock(){
+            return false
         }
         
-        debug.affirm("Parse completed successfully", caller: self)
+        if !matchAndConsume(TokenType.EOL, token: tokenManager.peekNextToken()){
+            return false
+        }
+        return true
     }
     
     func parseBlock() -> Bool {
@@ -52,7 +62,9 @@ class Parser: CompilerComponentProtocol {
             return false
         }
         
-        parseStatementList()
+        if !parseStatementList(){
+            return false
+        }
         
         if !matchAndConsume(TokenType.RBRACE, token: tokenManager.peekNextToken()){
             return false
