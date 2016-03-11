@@ -225,8 +225,10 @@ class Parser: CompilerComponentProtocol {
         debug.log("parseBoolExpr()", caller: self)
 
         //check for boolval first
-        if matchAndConsume(TokenType.BOOLVAL, token: tokenManager.peekNextToken()){
-            return true
+        if tokenManager.peekNextToken()?.type == TokenType.BOOLVAL{
+            if matchAndConsume(TokenType.BOOLVAL, token: tokenManager.peekNextToken()){
+                return true
+            }
         }
         
         //if not boolval, contunue evaluating for boolean expr
@@ -283,8 +285,10 @@ class Parser: CompilerComponentProtocol {
     func parseIntExpr() -> Bool {
         debug.log("parseIntExpr()", caller: self)
 
-        if !matchAndConsume(TokenType.DIGIT, token: tokenManager.peekNextToken()){
-            return false
+        if tokenManager.peekNextToken()?.type == TokenType.DIGIT {
+            if !matchAndConsume(TokenType.DIGIT, token: tokenManager.peekNextToken()){
+                return false
+            }
         }
         
         let token = tokenManager.peekNextToken()
