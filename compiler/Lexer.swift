@@ -16,7 +16,7 @@ class Lexer: CompilerComponentProtocol{
     let patterns:[(type: TokenType, pattern: String)] = [
         (TokenType.IF, "if"),
         (TokenType.DIGIT, "[0-9]"),
-        (TokenType.STRING, "\"+[a-zA-Z0-9 ]+\""),
+        (TokenType.STRING, "\"+[a-zA-Z0-9 ]*+\""),
         (TokenType.PRINT, "print"),
         (TokenType.LPAREN, "\\("),
         (TokenType.RPAREN, "\\)"),
