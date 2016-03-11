@@ -42,6 +42,7 @@ enum TokenType{
     case RPAREN
     case SPACE
     case BOOLOP
+    case BOOLVAL
     case INTOP
     case TYPE
     case ASSIGN

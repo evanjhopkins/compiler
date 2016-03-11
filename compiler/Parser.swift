@@ -192,6 +192,12 @@ class Parser: CompilerComponentProtocol {
         return true
     }
     func parseBoolExpr() -> Bool {
+        //check for boolval first
+        if matchAndConsume(TokenType.BOOLVAL, token: tokenManager.peekNextToken()){
+            return true
+        }
+        
+        //if not boolval, contunue evaluating for boolean expr
         if !matchAndConsume(TokenType.LPAREN, token: tokenManager.peekNextToken()){
             return false
         }
@@ -231,7 +237,7 @@ class Parser: CompilerComponentProtocol {
             }
             return true
         }
-        else if token!.isType(TokenType.LPAREN) {
+        else if token!.isType(TokenType.LPAREN) || token!.isType(TokenType.BOOLVAL) {
             return parseBoolExpr()
         }
         else{
