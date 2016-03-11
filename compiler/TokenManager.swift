@@ -25,6 +25,17 @@ class TokenManager: CompilerComponentProtocol {
         return nextToken
     }
     
+    func findEndOfCurrentProgram() {
+        if hasNextToken() {
+            if peekNextToken()?.type == TokenType.EOL {
+                consumeNextToken()
+                return
+            }
+            consumeNextToken()
+            findEndOfCurrentProgram()
+        }
+    }
+    
     func peekNextToken() -> Token? {
         if !hasNextToken(){
             return nil

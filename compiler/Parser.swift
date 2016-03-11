@@ -37,21 +37,27 @@ class Parser: CompilerComponentProtocol {
     }
     
     func parse() {
-        print("\n\n::Parsing Program::\n\n")
+        print("\n")
+        debug.log("parse()", caller: self)
+        
         if parseProgram(){
             debug.affirm("Parse completed successfully", caller: self)
-            
-            //handle possibility of multiple programs in one file
-            if tokenManager.hasNextToken() {
-                parse()
-            }
         }
         else{
             debug.error("Parse failed", caller: self)
+            //consume remaining tokens in this broken program
+            tokenManager.findEndOfCurrentProgram()
+        }
+        
+        //handle possibility of multiple programs in one file
+        if tokenManager.hasNextToken() {
+            parse()
         }
     }
     
     func parseProgram() -> Bool {
+        debug.log("parseProgram()", caller: self)
+
         if !parseBlock(){
             return false
         }
@@ -63,7 +69,8 @@ class Parser: CompilerComponentProtocol {
     }
     
     func parseBlock() -> Bool {
-        
+        debug.log("parseBlock()", caller: self)
+
         if !matchAndConsume(TokenType.LBRACE, token: tokenManager.peekNextToken()){
             return false
         }
@@ -79,7 +86,8 @@ class Parser: CompilerComponentProtocol {
     }
     
     func parseStatementList() -> Bool {
-        
+        debug.log("parseStatementList()", caller: self)
+
         //peeking ahead to see if this is a ε case
         if tokenManager.hasNextToken() {
             if (tokenManager.peekNextToken()?.type == TokenType.RBRACE) {
@@ -102,6 +110,8 @@ class Parser: CompilerComponentProtocol {
     }
     
     func parseStatement() -> Bool {
+        debug.log("parseStatement()", caller: self)
+
         let token = tokenManager.peekNextToken()
         switch(token!.type){
             case TokenType.PRINT:
@@ -122,6 +132,8 @@ class Parser: CompilerComponentProtocol {
     }
     
     func parsePrintStatement() -> Bool {
+        debug.log("parsePrintStatement()", caller: self)
+
         //check for PRINT
         if !matchAndConsume(TokenType.PRINT, token: tokenManager.peekNextToken()){
             return false
@@ -145,6 +157,8 @@ class Parser: CompilerComponentProtocol {
         
     }
     func parseAssignmentStatement() -> Bool {
+        debug.log("parseAssignmentStatement()", caller: self)
+
         //id
         if !matchAndConsume(TokenType.CHAR, token: tokenManager.peekNextToken()){
             return false
@@ -160,6 +174,8 @@ class Parser: CompilerComponentProtocol {
         return true
     }
     func parseVarDecl() -> Bool {
+        debug.log("parseVarDecl()", caller: self)
+
         if !matchAndConsume(TokenType.TYPE, token: tokenManager.peekNextToken()){
             return false
         }
@@ -172,6 +188,8 @@ class Parser: CompilerComponentProtocol {
     }
 
     func parseWhileStatement() -> Bool {
+        debug.log("parseWhileStatement()", caller: self)
+
         if !matchAndConsume(TokenType.WHILE, token: tokenManager.peekNextToken()){
             return false
         }
@@ -185,7 +203,10 @@ class Parser: CompilerComponentProtocol {
         }
         return true
     }
+    
     func parseIfStatement() -> Bool {
+        debug.log("parseIfStatement()", caller: self)
+
         //consume "IF"
         tokenManager.consumeNextToken()
         if !parseBoolExpr(){
@@ -197,7 +218,10 @@ class Parser: CompilerComponentProtocol {
         }
         return true
     }
+    
     func parseBoolExpr() -> Bool {
+        debug.log("parseBoolExpr()", caller: self)
+
         //check for boolval first
         if matchAndConsume(TokenType.BOOLVAL, token: tokenManager.peekNextToken()){
             return true
@@ -226,6 +250,8 @@ class Parser: CompilerComponentProtocol {
         return true
     }
     func parseExpr() -> Bool {
+        debug.log("parseExpr()", caller: self)
+
         let token = tokenManager.peekNextToken()
         
         if token!.isType(TokenType.DIGIT) {
@@ -253,7 +279,8 @@ class Parser: CompilerComponentProtocol {
     }
 
     func parseIntExpr() -> Bool {
-        
+        debug.log("parseIntExpr()", caller: self)
+
         if !matchAndConsume(TokenType.DIGIT, token: tokenManager.peekNextToken()){
             return false
         }
