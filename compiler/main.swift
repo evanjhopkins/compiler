@@ -8,19 +8,11 @@
 
 import Foundation
 
+let stdin = NSFileHandle.fileHandleWithStandardInput()
+
+let source = NSString(data: stdin.availableData, encoding: NSUTF8StringEncoding) as! String
+
 let lexer = Lexer()
-
-
-
-func input() -> String {
-    let keyboard = NSFileHandle.fileHandleWithStandardInput()
-    let inputData = keyboard.availableData
-    return NSString(data: inputData, encoding: NSUTF8StringEncoding) as! String
-}
-
-print("Please paste source:")
-let source = input()
-print("\(source)")
 
 let tokens: [Token] = lexer.lex(source)
 
@@ -29,4 +21,3 @@ let parser = Parser(tokens: tokens)
 parser.parse()
 
 let debug = Debug.sharedInstance
-    
