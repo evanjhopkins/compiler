@@ -226,7 +226,7 @@ class Parser: CompilerComponentProtocol {
             return true
         }
         else if token!.isType(TokenType.CHAR) {
-            if !matchAndConsume(TokenType.LBRACE, token: tokenManager.peekNextToken()){
+            if !matchAndConsume(TokenType.CHAR, token: tokenManager.peekNextToken()){
                 return false
             }
             return true
