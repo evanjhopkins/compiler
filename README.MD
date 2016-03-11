@@ -1,5 +1,7 @@
 
-Compiler in swift
+###Compiler in swift
+Note, the compiled compiler lives in the root of this repo: "compiler_binary". Feel free to recompile it from the source if you desire.
+
 
 ##Instructions to Run
 If you would like to run source from a file, you can do it:  
