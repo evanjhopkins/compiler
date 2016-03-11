@@ -1,0 +1,38 @@
+{}$
+
+{{{{{{}}}}}}$
+
+{print("")}$
+
+{print(a)}$
+
+{print(2)}$
+
+{print("a")}$
+
+{print(false)}$
+
+{print("inta")}$
+
+{a=1}}$
+
+{a = 1}$
+
+{a = 1 + 2 + 3 + 4   +   5}$
+
+{a = 4 + a}$
+
+{int a}$
+
+{string a}$
+
+{boolean a}$
+
+{
+	int a
+	a = a
+	string b
+	a = b
+}$
+
+
