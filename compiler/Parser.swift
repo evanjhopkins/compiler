@@ -73,6 +73,16 @@ class Parser: CompilerComponentProtocol {
     }
     
     func parseStatementList() -> Bool {
+        
+        //peeking ahead to see if this is a ε case
+        if tokenManager.hasNextToken() {
+            if (tokenManager.peekNextToken()?.type == TokenType.RBRACE) {
+                //RBRACE will be consumed by parseBlock
+                return true
+            }
+        }
+        
+        //otherwise evalueate like normal
         if !parseStatement(){
             return false
         }
