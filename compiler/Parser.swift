@@ -11,7 +11,7 @@ import Foundation
 
 class Parser: CompilerComponentProtocol {
     var CLASSNAME = "PARSER"
-    var VERBOSE = true
+    var progCount = 1;
     let debug = Debug.sharedInstance
 
     let tokenManager: TokenManager
@@ -38,6 +38,7 @@ class Parser: CompilerComponentProtocol {
     
     func parse() {
         print("\n")
+        debug.affirm("Parsing program "+self.progCount.description+"...", caller: self)
         debug.log("parse()", caller: self)
         
         if parseProgram(){
@@ -51,6 +52,7 @@ class Parser: CompilerComponentProtocol {
         
         //handle possibility of multiple programs in one file
         if tokenManager.hasNextToken() {
+            self.progCount += 1
             parse()
         }
     }

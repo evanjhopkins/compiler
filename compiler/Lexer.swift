@@ -10,7 +10,6 @@ import Foundation
 
 class Lexer: CompilerComponentProtocol{
     var CLASSNAME = "LEXER"
-    var VERBOSE = true
     let debug = Debug.sharedInstance
     
     let patterns:[(type: TokenType, pattern: String)] = [
@@ -34,6 +33,7 @@ class Lexer: CompilerComponentProtocol{
     ]
     
     func lex(input: String) -> [Token] {
+        debug.affirm("Lexing...", caller: self)
         let tokens: [Token] = getLexy(input)
         debug.affirm("Lex completed successfully", caller: self)
         return tokens
@@ -45,9 +45,9 @@ class Lexer: CompilerComponentProtocol{
         var substr = ""
         var lastMatch: Token?
         var lastInput: String?
+        
         for char in input.characters {
             string = string + String(char)
-            //print("\""+string+"\"")
         
             if let matchedToken = matchStringToToken(string) {
                 lastMatch = matchedToken
@@ -64,7 +64,7 @@ class Lexer: CompilerComponentProtocol{
             if lastMatch!.type != TokenType.SPACE {
                 debug.log("\""+lastMatch!.value+"\" --> [" + String(lastMatch!.type) + "]", caller: self)
                 if lastMatch!.type == TokenType.EOL {
-                    print("")//line break to seperate programs in lex output
+                    debug.log("----------------------", caller: self)//line break to seperate programs in lex output
                 }
             }
             tokens += getLexy(lastInput!)

@@ -8,12 +8,14 @@
 
 import Foundation
 
-class Debug{
+class Debug: CompilerComponentProtocol {
+    var CLASSNAME = "DEBUG"
     static let sharedInstance = Debug()
     var log: [JSON] = []
+    var verbose = true
     
     init(){
-        
+        self.affirm("Running in " + (self.verbose ? "verbose" : "non-verbose") + " mode\n", caller: self)
     }
     
     func error(message: String, caller: CompilerComponentProtocol) {
@@ -31,7 +33,9 @@ class Debug{
     func log(message: String, caller: CompilerComponentProtocol) {
         let log = Log(componentName: caller.CLASSNAME, message: message, level: LogLevel.LOG)
         self.log.append(log.serialize())
-        log.display()
+        if verbose {
+            log.display()
+        }
     }
     
     func affirm(message: String, caller: CompilerComponentProtocol) {
