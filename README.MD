@@ -1,7 +1,15 @@
 
-Compiler in swift
+###Compiler in swift
+Note, the compiled compiler lives in the root of this repo: "compiler_binary". Feel free to recompile it from the source if you desire.
 
-Web UI available at: http://45.33.86.166/
-- note the webui currently only compiles a static piece of source
 
-The easiest way to run the compiler is through xcode. Upon running the main class (hit the run button in the top right of xcode), you will be promted to paste in the source you wish to test.
+##Instructions to Run
+If you would like to run source from a file, you can do it:  
+   ```cat your_source_file.txt | ./compiler_binary```
+
+You may also type your source directly in the command line in the following way:  
+   ```echo "{print(5)}$" | ./compiler_binary```
+
+##Verbose
+You can toggle verbose mode by add a "-v" flag when running the compiler   
+   ```cat your_source_file.txt | ./compiler_binary -v```
