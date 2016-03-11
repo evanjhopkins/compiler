@@ -12,9 +12,13 @@ class Debug: CompilerComponentProtocol {
     var CLASSNAME = "DEBUG"
     static let sharedInstance = Debug()
     var log: [JSON] = []
-    var verbose = true
+    var verbose = false
     
     init(){
+    }
+    
+    func toggleVerbose(isVerboseOn: Bool) {
+        self.verbose = isVerboseOn
         self.affirm("Running in " + (self.verbose ? "verbose" : "non-verbose") + " mode\n", caller: self)
     }
     
