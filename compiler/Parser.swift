@@ -37,8 +37,14 @@ class Parser: CompilerComponentProtocol {
     }
     
     func parse() {
+        print("\n\n::Parsing Program::\n\n")
         if parseProgram(){
             debug.affirm("Parse completed successfully", caller: self)
+            
+            //handle possibility of multiple programs in one file
+            if tokenManager.hasNextToken() {
+                parse()
+            }
         }
         else{
             debug.error("Parse failed", caller: self)
