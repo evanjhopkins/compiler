@@ -104,7 +104,7 @@ class Parser: CompilerComponentProtocol {
                 return parseVarDecl()
             case TokenType.WHILE:
                 return parseWhileStatement()
-            case TokenType.ASSIGN:
+            case TokenType.CHAR:
                 return parseAssignmentStatement()
             case TokenType.IF:
                 return parseIfStatement()
