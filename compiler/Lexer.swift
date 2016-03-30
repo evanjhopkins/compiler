@@ -34,8 +34,11 @@ class Lexer: CompilerComponentProtocol{
     
     func lex(input: String) -> [Token] {
         debug.affirm("Lexing...", caller: self)
+        let lexerStart = NSDate().timeIntervalSince1970 //mark time when lexer starts
         let tokens: [Token] = getLexy(input)
-        debug.affirm("Lex completed successfully", caller: self)
+        let lexerStop = NSDate().timeIntervalSince1970 //mark time when lexer completes
+        let executionTime = lexerStop - lexerStart
+        debug.affirm("Lex completed successfully in: "+String(executionTime)+"s", caller: self)
         return tokens
     }
     private func getLexy(input: String) -> [Token]{

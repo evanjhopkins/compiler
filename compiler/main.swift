@@ -25,4 +25,4 @@ let tokens: [Token] = lexer.lex(source)
 
 let parser = Parser(tokens: tokens)
 
-parser.parse()
+parser.parser()

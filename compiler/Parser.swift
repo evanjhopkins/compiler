@@ -36,13 +36,20 @@ class Parser: CompilerComponentProtocol {
         }
     }
     
-    func parse() {
+    func parser() {
         print("\n")
-        debug.affirm("Parsing program "+self.progCount.description+"...", caller: self)
         debug.log("parse()", caller: self)
-        
+        let parserStart = NSDate().timeIntervalSince1970 //mark time when parser starts
+        parse()
+        let parserEnd = NSDate().timeIntervalSince1970 //mark time when parser compleres
+        let executionTime = parserEnd - parserStart
+        debug.affirm("Parse completed successfully in: "+String(executionTime)+"s", caller: self)
+    }
+    
+    func parse() {
+        debug.affirm("Parsing program "+self.progCount.description+"...", caller: self)
         if parseProgram(){
-            debug.affirm("Parse completed successfully", caller: self)
+            //debug.affirm("Parse completed successfully in: "+String(executionTime)+"s", caller: self)
         }
         else{
             debug.error("Parse failed", caller: self)
