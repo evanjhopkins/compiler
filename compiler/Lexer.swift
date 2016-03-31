@@ -59,8 +59,6 @@ class Lexer: CompilerComponentProtocol{
     private func getLexy(input: String) -> Bool{
         
         var string: String = ""
-        //var tokens: [Token] = []
-        var substr = ""
         var lastMatch: Token?
         var lastInput: String?
         
@@ -86,17 +84,14 @@ class Lexer: CompilerComponentProtocol{
         }
         
         if(input.characters.count > 0 ) {
-            substr = string.substringFromIndex(string.startIndex.advancedBy(1))
             debug.error("Unrecognized Token: "+String(input.characters.first!), caller: self)
             return false
-            //getLexy(substr)// no point in continuting lex once a bad token is found
         }
 
         return true
     }
     
     private func matchStringToToken(string: String) -> Token?{
-        //print("\""+string+"\"")
         for pattern in patterns {
             if string.rangeOfString(pattern.pattern, options: .RegularExpressionSearch) == string.characters.indices {
                 return Token(value: string, type: pattern.type)

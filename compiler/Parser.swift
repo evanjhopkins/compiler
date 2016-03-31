@@ -7,7 +7,6 @@
 //
 
 import Foundation
-//import Darwin
 
 class Parser: CompilerComponentProtocol {
     var CLASSNAME = "PARSER"
@@ -36,40 +35,26 @@ class Parser: CompilerComponentProtocol {
         }
     }
     
-    func parser(tokens: [Token]) -> Bool {
-        self.tokenManager = TokenManager(tokens: tokens)
+    func parse(tokens: [Token]) -> Bool {
         debug.log("Parsing...", caller: self)
+        self.tokenManager = TokenManager(tokens: tokens)
+
         let parserStart = NSDate().timeIntervalSince1970 //mark time when parser starts
-        let parseSucceeded = parse()
+        
+        debug.log("parse()", caller: self)
+        let parseSucceeded = parseProgram()
+
         let parserEnd = NSDate().timeIntervalSince1970 //mark time when parser compleres
         let executionTime = parserEnd - parserStart
-        
-        if parseSucceeded {
+
+        if parseSucceeded{
             debug.affirm("Parse succeeded, "+String(executionTime)+"s", caller: self)
             return true
-        }else {
+        }
+        else{
             debug.error("Parse failed, "+String(executionTime)+"s", caller: self)
             return false
         }
-    }
-    
-    func parse() -> Bool {
-        debug.log("parse()", caller: self)
-        if parseProgram(){
-            //debug.affirm("Parse completed successfully in: "+String(executionTime)+"s", caller: self)
-        }
-        else{
-            //consume remaining tokens in this broken program
-            tokenManager.findEndOfCurrentProgram()
-            return false
-        }
-        
-        //handle possibility of multiple programs in one file
-        if tokenManager.hasNextToken() {
-            self.progCount += 1
-            parse()
-        }
-        return true
     }
     
     func parseProgram() -> Bool {

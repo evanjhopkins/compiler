@@ -36,7 +36,7 @@ class Program: CompilerComponentProtocol {
     }
     
     private func parse(tokens: [Token]) -> Bool {
-        self.parser.parser(tokens)
+        self.parser.parse(tokens)
         return true
     }
     
