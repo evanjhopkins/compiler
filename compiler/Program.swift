@@ -28,11 +28,12 @@ class Program: CompilerComponentProtocol {
         debug.affirm("Compiling program "+String(self.programId), caller: self)
         if lex() {
             if parse(self.lexer.getTokens()) {
-                debug.affirm("Compile succeeded\n", caller: self)
-                return
+                debug.affirm("Compile succeeded", caller: self)
             }
+        }else {
+            debug.affirm("Compile failed", caller: self)
         }
-        debug.affirm("Compile failed\n", caller: self)
+        print("----------------------------------------------------------------------")
     }
     
     private func parse(tokens: [Token]) -> Bool {

@@ -42,13 +42,13 @@ class Lexer: CompilerComponentProtocol{
         let lexerStart = NSDate().timeIntervalSince1970 //mark time when lexer starts
         let lexSucceeded = getLexy(input)
         let lexerStop = NSDate().timeIntervalSince1970 //mark time when lexer completes
-        let executionTime = lexerStop - lexerStart
+        let executionTime = Int(Double(round(1000*(lexerStop - lexerStart))/1000)*1000)
         
         if lexSucceeded {
-            debug.affirm("Lex completed, "+String(executionTime)+"s", caller: self)
+            debug.affirm("Lex succeeded, "+String(executionTime)+"ms", caller: self)
             return true
         }
-        debug.error("Lex failed, "+String(executionTime)+"s", caller: self)
+        debug.error("Lex failed, "+String(executionTime)+"ms", caller: self)
         return false
     }
     
