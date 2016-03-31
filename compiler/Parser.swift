@@ -37,7 +37,6 @@ class Parser: CompilerComponentProtocol {
     }
     
     func parser() {
-        print("\n")
         debug.log("parse()", caller: self)
         let parserStart = NSDate().timeIntervalSince1970 //mark time when parser starts
         parse()

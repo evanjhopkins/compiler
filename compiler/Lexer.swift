@@ -66,9 +66,6 @@ class Lexer: CompilerComponentProtocol{
             //throw out white space
             if lastMatch!.type != TokenType.SPACE {
                 debug.log("\""+lastMatch!.value+"\" --> [" + String(lastMatch!.type) + "]", caller: self)
-                if lastMatch!.type == TokenType.EOL {
-                    debug.log("----------------------", caller: self)//line break to seperate programs in lex output
-                }
             }
             tokens += getLexy(lastInput!)
             return tokens

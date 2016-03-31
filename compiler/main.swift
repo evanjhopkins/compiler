@@ -19,10 +19,6 @@ for argument in Process.arguments {
     }
 }
 
-let lexer = Lexer()
-
-let tokens: [Token] = lexer.lex(source)
-
-let parser = Parser(tokens: tokens)
-
-parser.parser()
+for program in Program.findPrograms(source) {
+    program.compile()
+}

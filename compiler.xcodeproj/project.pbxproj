@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		73A763121CAD7586005DC413 /* Program.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73A763111CAD7586005DC413 /* Program.swift */; };
 		E122B6961C5A7563007E3273 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = E122B6951C5A7563007E3273 /* main.swift */; };
 		E1D088621C7D2744003430E7 /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1D088611C7D2744003430E7 /* Token.swift */; };
 		E1D088641C7E6B0D003430E7 /* Lexer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1D088631C7E6B0D003430E7 /* Lexer.swift */; };
@@ -30,6 +31,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		73A763111CAD7586005DC413 /* Program.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Program.swift; sourceTree = "<group>"; };
 		E122B6921C5A7563007E3273 /* compiler */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = compiler; sourceTree = BUILT_PRODUCTS_DIR; };
 		E122B6951C5A7563007E3273 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		E1D088611C7D2744003430E7 /* Token.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
@@ -73,6 +75,7 @@
 			children = (
 				E1D0886E1C7F8ED9003430E7 /* SwiftyJSON.swift */,
 				E122B6951C5A7563007E3273 /* main.swift */,
+				73A763111CAD7586005DC413 /* Program.swift */,
 				E1D088611C7D2744003430E7 /* Token.swift */,
 				E1D088631C7E6B0D003430E7 /* Lexer.swift */,
 				E1D0886A1C7EAD26003430E7 /* CompilerComponentProtocol.swift */,
@@ -145,6 +148,7 @@
 				E1D0886B1C7EAD26003430E7 /* CompilerComponentProtocol.swift in Sources */,
 				E1D0886F1C7F8ED9003430E7 /* SwiftyJSON.swift in Sources */,
 				E1D088621C7D2744003430E7 /* Token.swift in Sources */,
+				73A763121CAD7586005DC413 /* Program.swift in Sources */,
 				E1D088641C7E6B0D003430E7 /* Lexer.swift in Sources */,
 				E122B6961C5A7563007E3273 /* main.swift in Sources */,
 				E1D0886D1C7EBF17003430E7 /* TokenManager.swift in Sources */,
