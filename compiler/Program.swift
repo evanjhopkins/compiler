@@ -14,27 +14,34 @@ class Program: CompilerComponentProtocol {
     let debug = Debug.sharedInstance
     let source: String
     let programId: String//i.e. program number
+    let lexer: Lexer
+    let parser: Parser
     
     init(source: String, programId: String) {
         self.source = source
         self.programId = programId
+        self.lexer = Lexer()
+        self.parser = Parser()
     }
     
     func compile() {
         debug.affirm("Compiling program "+String(self.programId), caller: self)
-        parse(lex())
-        debug.affirm("Compile completed\n", caller: self)
+        if lex() {
+            if parse(self.lexer.getTokens()) {
+                debug.affirm("Compile succeeded\n", caller: self)
+                return
+            }
+        }
+        debug.affirm("Compile failed\n", caller: self)
     }
     
-    private func parse(tokens: [Token]) {
-        let parser = Parser(tokens: tokens)
-        parser.parser()
+    private func parse(tokens: [Token]) -> Bool {
+        self.parser.parser(tokens)
+        return true
     }
     
-    private func lex() -> [Token] {
-        let lexer = Lexer()
-        let tokens: [Token] = lexer.lex(self.source)
-        return tokens
+    private func lex() -> Bool {
+        return self.lexer.lex(self.source)
     }
     
     //splits source into individual programs

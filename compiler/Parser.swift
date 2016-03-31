@@ -14,12 +14,12 @@ class Parser: CompilerComponentProtocol {
     var progCount = 1;
     let debug = Debug.sharedInstance
 
-    let tokenManager: TokenManager
+    var tokenManager: TokenManager
     
-    init(tokens: [Token]) {
-        self.tokenManager = TokenManager(tokens: tokens)
+    init() {
+        // TODO: stop using this dummy initialization to suppress error
+        self.tokenManager = TokenManager(tokens: [])
     }
-    
     
     //given a token and an expected token type, return true if token is the expected type
     func matchAndConsume(expectedType: TokenType, token: Token?) -> Bool {
@@ -36,24 +36,32 @@ class Parser: CompilerComponentProtocol {
         }
     }
     
-    func parser() {
-        debug.log("parse()", caller: self)
+    func parser(tokens: [Token]) -> Bool {
+        self.tokenManager = TokenManager(tokens: tokens)
+        debug.log("Parsing...", caller: self)
         let parserStart = NSDate().timeIntervalSince1970 //mark time when parser starts
-        parse()
+        let parseSucceeded = parse()
         let parserEnd = NSDate().timeIntervalSince1970 //mark time when parser compleres
         let executionTime = parserEnd - parserStart
-        debug.affirm("Parse completed successfully in: "+String(executionTime)+"s", caller: self)
+        
+        if parseSucceeded {
+            debug.affirm("Parse succeeded, "+String(executionTime)+"s", caller: self)
+            return true
+        }else {
+            debug.error("Parse failed, "+String(executionTime)+"s", caller: self)
+            return false
+        }
     }
     
-    func parse() {
-        debug.affirm("Parsing program "+self.progCount.description+"...", caller: self)
+    func parse() -> Bool {
+        debug.log("parse()", caller: self)
         if parseProgram(){
             //debug.affirm("Parse completed successfully in: "+String(executionTime)+"s", caller: self)
         }
         else{
-            debug.error("Parse failed", caller: self)
             //consume remaining tokens in this broken program
             tokenManager.findEndOfCurrentProgram()
+            return false
         }
         
         //handle possibility of multiple programs in one file
@@ -61,6 +69,7 @@ class Parser: CompilerComponentProtocol {
             self.progCount += 1
             parse()
         }
+        return true
     }
     
     func parseProgram() -> Bool {

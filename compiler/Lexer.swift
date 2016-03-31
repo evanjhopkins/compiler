@@ -11,6 +11,11 @@ import Foundation
 class Lexer: CompilerComponentProtocol{
     var CLASSNAME = "LEXER"
     let debug = Debug.sharedInstance
+    var tokens: [Token]
+    
+    init () {
+        self.tokens = [Token]()
+    }
     
     let patterns:[(type: TokenType, pattern: String)] = [
         (TokenType.IF, "if"),
@@ -32,19 +37,29 @@ class Lexer: CompilerComponentProtocol{
         (TokenType.EOL, "\\$")
     ]
     
-    func lex(input: String) -> [Token] {
-        debug.affirm("Lexing...", caller: self)
+    func lex(input: String) -> Bool {
+        debug.log("Lexing...", caller: self)
         let lexerStart = NSDate().timeIntervalSince1970 //mark time when lexer starts
-        let tokens: [Token] = getLexy(input)
+        let lexSucceeded = getLexy(input)
         let lexerStop = NSDate().timeIntervalSince1970 //mark time when lexer completes
         let executionTime = lexerStop - lexerStart
-        debug.affirm("Lex completed successfully in: "+String(executionTime)+"s", caller: self)
-        return tokens
+        
+        if lexSucceeded {
+            debug.affirm("Lex completed, "+String(executionTime)+"s", caller: self)
+            return true
+        }
+        debug.error("Lex failed, "+String(executionTime)+"s", caller: self)
+        return false
     }
-    private func getLexy(input: String) -> [Token]{
+    
+    func getTokens() -> [Token] {
+        return self.tokens
+    }
+    
+    private func getLexy(input: String) -> Bool{
         
         var string: String = ""
-        var tokens: [Token] = []
+        //var tokens: [Token] = []
         var substr = ""
         var lastMatch: Token?
         var lastInput: String?
@@ -61,23 +76,23 @@ class Lexer: CompilerComponentProtocol{
         if (lastMatch != nil){
             if (!lastMatch!.isType(TokenType.SPACE)){
                 //ignore space
-                tokens.append(lastMatch!)
+                self.tokens.append(lastMatch!)
             }
             //throw out white space
             if lastMatch!.type != TokenType.SPACE {
                 debug.log("\""+lastMatch!.value+"\" --> [" + String(lastMatch!.type) + "]", caller: self)
             }
-            tokens += getLexy(lastInput!)
-            return tokens
+            return getLexy(lastInput!)
         }
         
         if(input.characters.count > 0 ) {
             substr = string.substringFromIndex(string.startIndex.advancedBy(1))
             debug.error("Unrecognized Token: "+String(input.characters.first!), caller: self)
-            tokens += getLexy(substr)
+            return false
+            //getLexy(substr)// no point in continuting lex once a bad token is found
         }
 
-        return tokens
+        return true
     }
     
     private func matchStringToToken(string: String) -> Token?{
