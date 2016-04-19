@@ -281,21 +281,27 @@ class Parser: CompilerComponentProtocol {
         debug.log("parseBoolExpr()", caller: self)
         self.CST = self.CST.addNode("Boolean Expression")
         
+        //consume "("
+        self.CST.addLeaf((tokenManager.peekNextToken()?.value)!)
+        if !matchAndConsume(TokenType.LPAREN, token: tokenManager.peekNextToken()){
+            return false
+        }
+        
         //check for boolval first
         if tokenManager.peekNextToken()?.type == TokenType.BOOLVAL{
             self.CST.addLeaf((tokenManager.peekNextToken()?.value)!)
             if matchAndConsume(TokenType.BOOLVAL, token: tokenManager.peekNextToken()){
+                //consume ")"
+                self.CST.addLeaf((tokenManager.peekNextToken()?.value)!)
+                if !matchAndConsume(TokenType.RPAREN, token: tokenManager.peekNextToken()){
+                    return false
+                }
                 self.CST = self.CST.parent!
                 return true
             }
         }
         
         //if not boolval, contunue evaluating for boolean expr
-        self.CST.addLeaf((tokenManager.peekNextToken()?.value)!)
-        if !matchAndConsume(TokenType.LPAREN, token: tokenManager.peekNextToken()){
-            return false
-        }
-        
         if !parseExpr() {
             return false
         }
