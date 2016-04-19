@@ -16,29 +16,47 @@ class Program: CompilerComponentProtocol {
     let programId: String//i.e. program number
     let lexer: Lexer
     let parser: Parser
+    let analyzer: SyntaxTreeManager
     
     init(source: String, programId: String) {
         self.source = source
         self.programId = programId
         self.lexer = Lexer()
         self.parser = Parser()
+        self.analyzer = SyntaxTreeManager()
     }
     
     func compile() {
         debug.affirm("Compiling program "+String(self.programId), caller: self)
+        
         if lex() {
             if parse(self.lexer.getTokens()) {
-                debug.affirm("Compile succeeded", caller: self)
+                let CST = parser.CST
+                if analyze(CST) {
+                    debug.affirm("Compile succeeded", caller: self)
+                    if debug.verbose {
+                        print("\nCST")
+                        CST.display()
+                        print("\nAST")
+                        analyzer.AST.display()
+                        analyzer.scope.display()
+                    }
+                    print("----------------------------------------------------------------------")
+                    return
+                }
             }
-        }else {
-            debug.affirm("Compile failed", caller: self)
         }
+        debug.error("Compile failed", caller: self)
         print("----------------------------------------------------------------------")
     }
     
+    private func analyze(cst: SyntaxTreeNode) -> Bool {
+        return self.analyzer.analyze(cst)
+    }
+    
     private func parse(tokens: [Token]) -> Bool {
-        self.parser.parse(tokens)
-        return true
+        return self.parser.parse(tokens)
+        
     }
     
     private func lex() -> Bool {
