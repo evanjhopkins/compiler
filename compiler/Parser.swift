@@ -289,23 +289,28 @@ class Parser: CompilerComponentProtocol {
         
         //check for boolval first
         if tokenManager.peekNextToken()?.type == TokenType.BOOLVAL{
+            
             self.CST.addLeaf((tokenManager.peekNextToken()?.value)!)
             if matchAndConsume(TokenType.BOOLVAL, token: tokenManager.peekNextToken()){
-                //consume ")"
-                self.CST.addLeaf((tokenManager.peekNextToken()?.value)!)
-                if !matchAndConsume(TokenType.RPAREN, token: tokenManager.peekNextToken()){
-                    return false
+                if !(tokenManager.peekNextToken()?.type == TokenType.BOOLOP) {
+                    //consume ")"
+                    self.CST.addLeaf((tokenManager.peekNextToken()?.value)!)
+                    if !matchAndConsume(TokenType.RPAREN, token: tokenManager.peekNextToken()){
+                        return false
+                    }
+                    self.CST = self.CST.parent!
+                    return true
                 }
-                self.CST = self.CST.parent!
-                return true
+            }
+        } else{
+            //if not boolval, contunue evaluating for boolean expr
+            if !parseExpr() {
+                return false
             }
         }
         
-        //if not boolval, contunue evaluating for boolean expr
-        if !parseExpr() {
-            return false
-        }
         
+        //consume "=="
         self.CST.addLeaf((tokenManager.peekNextToken()?.value)!)
         if !matchAndConsume(TokenType.BOOLOP, token: tokenManager.peekNextToken()){
             return false
