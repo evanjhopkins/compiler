@@ -111,7 +111,14 @@ class SyntaxTreeManager: CompilerComponentProtocol  {
             }else {
                 //raw value
             }
-
+        } else if(node.value == "Boolean Expression") {
+            if node.children[1].value == "==" {
+                if !exprTypeCheck(node){
+                    return false
+                }
+            }
+            //let left = node.children[0]
+            
         } else{
             //if not a special case, do nothing and iterate over children
             for child in node.children {
@@ -121,6 +128,17 @@ class SyntaxTreeManager: CompilerComponentProtocol  {
             }
         }
         return true
+    }
+
+    func exprTypeCheck(node: SyntaxTreeNode) -> Bool {
+        let leftType = valType(node.children[0].value)
+        let rightType = valType(node.children[2].value)
+
+        if leftType == rightType{
+            return true
+        }
+        debug.error("Type mismatch, '" + node.children[0].value + "' not type compatable with '" + node.children[2].value+"'", caller: self)
+        return false
     }
     
     //confirm the action being conducted by node obeys type restrictions
