@@ -100,12 +100,17 @@ class SyntaxTreeManager: CompilerComponentProtocol  {
             self.varUsage[node.children[0].value] = "assigned"
 
         } else if(node.value == "Print Statement") {
-            //is variable in scope?
-            if !self.scope.scopeCheck(node.children[0].value) {
-                debug.error("Variable '" + node.children[0].value + "' was used before being declared" , caller: self)
+            //is this a raw value or var?
+            if (node.children[0].value.rangeOfString("[a-z]", options: .RegularExpressionSearch) == node.children[0].value.characters.indices) {
+                //is variable in scope?
+                if !self.scope.scopeCheck(node.children[0].value) {
+                    debug.error("Variable '" + node.children[0].value + "' was used before being declared" , caller: self)
+                }
+                //set the variable to the used (final) stage
+                self.varUsage[node.children[0].value] = "used"
+            }else {
+                //raw value
             }
-            //set the variable to the used (final) stage
-            self.varUsage[node.children[0].value] = "used"
 
         } else{
             //if not a special case, do nothing and iterate over children
