@@ -29,7 +29,7 @@ class Token {
 
 }
 
-enum TokenType{
+enum TokenType: String{
     case LBRACE
     case RBRACE
     case DIGIT
