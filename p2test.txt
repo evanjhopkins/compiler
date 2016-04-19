@@ -1,0 +1,36 @@
+{ 
+	int a 
+	boolean b
+	{ 
+		string c 
+		a=5
+		b = true
+		c = "inta"
+		print(c)
+	}
+	print(b)
+	print(a) 
+}$
+
+{ 
+	int a
+	{ 
+		boolean b 
+	}
+	a=1
+	print(b) 
+}$
+
+{ int b b = "word"	}$
+
+{a = 1}$
+
+{ int a a = false }$
+
+{int a int a print(a)}$
+
+{int a int b b = 5 print(b)}$
+
+{int a a = 5 int b b = 2 print(b)}$
+
+{int b b = 5 string x x = "word" {print(b+a)}}$
