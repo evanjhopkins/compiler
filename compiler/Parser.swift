@@ -15,12 +15,13 @@ class Parser: CompilerComponentProtocol {
 
     var tokenManager: TokenManager
     var CST: SyntaxTreeNode
-    
+    var AST: SyntaxTreeNode
     
     init() {
         // TODO: stop using this dummy initialization to suppress error
         self.tokenManager = TokenManager(tokens: [])
-        self.CST = SyntaxTreeNode(value: "Program", isLeaf: false)
+        self.CST = SyntaxTreeNode()
+        self.AST = SyntaxTreeNode()
     }
     
     //given a token and an expected token type, return true if token is the expected type
@@ -50,6 +51,9 @@ class Parser: CompilerComponentProtocol {
         let parserStop = NSDate().timeIntervalSince1970 //mark time when parser compleres
         let executionTime = Int(Double(round(1000*(parserStop - parserStart))/1000)*1000)
         
+//        self.CST.display()
+//        self.AST.display()
+        
         if parseSucceeded{
             debug.affirm("Parse succeeded, "+String(executionTime)+"ms", caller: self)
             return true
@@ -63,7 +67,7 @@ class Parser: CompilerComponentProtocol {
     func parseProgram() -> Bool {
         debug.log("parseProgram()", caller: self)
         //self.CST = SyntaxTreeManager()
-        self.CST = SyntaxTreeNode(value: "Program", isLeaf: false)
+        self.CST.addNode("Program")
 
         if !parseBlock(){
             return false
@@ -80,7 +84,9 @@ class Parser: CompilerComponentProtocol {
     
     func parseBlock() -> Bool {
         debug.log("parseBlock()", caller: self)
-       self.CST = self.CST.addNode("BLOCK")
+        self.CST = self.CST.addNode("BLOCK")
+        self.AST = self.AST.addNode("BLOCK")
+        self.AST.isLeaf = false
         
         self.CST.addLeaf((tokenManager.peekNextToken()?.value)!)
         if !matchAndConsume(TokenType.LBRACE, token: tokenManager.peekNextToken()){
@@ -96,6 +102,9 @@ class Parser: CompilerComponentProtocol {
             return false
         }
         
+        if self.AST.parent != nil {
+            self.AST = self.AST.parent!
+        }
         self.CST = self.CST.parent!
         return true
     }
@@ -167,7 +176,8 @@ class Parser: CompilerComponentProtocol {
     
     func parsePrintStatement() -> Bool {
         debug.log("parsePrintStatement()", caller: self)
-       self.CST = self.CST.addNode("Print Statement")
+        self.CST = self.CST.addNode("Print Statement")
+        self.AST = self.AST.addNode("Print Statement")
         
         //check for PRINT
         CST.addLeaf((tokenManager.peekNextToken()?.value)!)
@@ -192,6 +202,7 @@ class Parser: CompilerComponentProtocol {
             return false
         }
         
+        self.AST = self.AST.parent!
         self.CST = self.CST.parent!
         return true
         
@@ -199,9 +210,12 @@ class Parser: CompilerComponentProtocol {
     func parseAssignmentStatement() -> Bool {
         debug.log("parseAssignmentStatement()", caller: self)
         self.CST = self.CST.addNode("Assignment Statement")
+        self.AST = self.AST.addNode("Assignment Statement")
+
         
         //id
         self.CST.addLeaf((tokenManager.peekNextToken()?.value)!)
+        self.AST.addLeaf((tokenManager.peekNextToken()?.value)!)
         if !matchAndConsume(TokenType.CHAR, token: tokenManager.peekNextToken()){
             return false
         }
@@ -215,6 +229,7 @@ class Parser: CompilerComponentProtocol {
             return false
         }
         
+        self.AST = self.AST.parent!
         self.CST = self.CST.parent!
         return true
     }
@@ -222,25 +237,32 @@ class Parser: CompilerComponentProtocol {
     func parseVarDecl() -> Bool {
         debug.log("parseVarDecl()", caller: self)
         self.CST = self.CST.addNode("Variable Declaration")
+        self.AST = self.AST.addNode("Variable Declaration")
         
         self.CST.addLeaf((tokenManager.peekNextToken()?.value)!)
+        self.AST.addLeaf((tokenManager.peekNextToken()?.value)!)
+
         if !matchAndConsume(TokenType.TYPE, token: tokenManager.peekNextToken()){
             return false
         }
         
         //id
         self.CST.addLeaf((tokenManager.peekNextToken()?.value)!)
+        self.AST.addLeaf((tokenManager.peekNextToken()?.value)!)
         if !matchAndConsume(TokenType.CHAR, token: tokenManager.peekNextToken()){
             return false
         }
         
         self.CST = self.CST.parent!
+        self.AST = self.AST.parent!
+
         return true
     }
 
     func parseWhileStatement() -> Bool {
         debug.log("parseWhileStatement()", caller: self)
         self.CST = self.CST.addNode("While Statement")
+        self.AST = self.AST.addNode("While Statement")
         
         self.CST.addLeaf((tokenManager.peekNextToken()?.value)!)
         if !matchAndConsume(TokenType.WHILE, token: tokenManager.peekNextToken()){
@@ -255,6 +277,7 @@ class Parser: CompilerComponentProtocol {
             return false
         }
         
+        self.AST = self.AST.parent!
         self.CST = self.CST.parent!
         return true
     }
@@ -262,6 +285,7 @@ class Parser: CompilerComponentProtocol {
     func parseIfStatement() -> Bool {
         debug.log("parseIfStatement()", caller: self)
         self.CST = self.CST.addNode("If Statement")
+        self.AST = self.AST.addNode("If Statement")
         
         //consume "IF"
         tokenManager.consumeNextToken()
@@ -273,6 +297,7 @@ class Parser: CompilerComponentProtocol {
             return false
         }
         
+        self.AST = self.AST.parent!
         self.CST = self.CST.parent!
         return true
     }
@@ -281,15 +306,27 @@ class Parser: CompilerComponentProtocol {
         debug.log("parseBoolExpr()", caller: self)
         self.CST = self.CST.addNode("Boolean Expression")
         
+        //just a lone boolval
+        if tokenManager.peekNextToken()?.type == TokenType.BOOLVAL {
+            self.CST.addLeaf((tokenManager.peekNextToken()?.value)!)
+            self.AST.addLeaf((tokenManager.peekNextToken()?.value)!)
+            if !matchAndConsume(TokenType.BOOLVAL, token: tokenManager.peekNextToken()){
+                return false
+            }
+            self.CST = self.CST.parent!
+            return true
+        }
+        
         //consume "("
         self.CST.addLeaf((tokenManager.peekNextToken()?.value)!)
         if !matchAndConsume(TokenType.LPAREN, token: tokenManager.peekNextToken()){
             return false
         }
         
-        //check for boolval first
+        //check for boolval firsta
+        let left: String = (tokenManager.peekNextToken()?.value)!
         if tokenManager.peekNextToken()?.type == TokenType.BOOLVAL{
-            
+            self.AST.addLeaf((tokenManager.peekNextToken()?.value)!)
             self.CST.addLeaf((tokenManager.peekNextToken()?.value)!)
             if matchAndConsume(TokenType.BOOLVAL, token: tokenManager.peekNextToken()){
                 if !(tokenManager.peekNextToken()?.type == TokenType.BOOLOP) {
@@ -312,6 +349,9 @@ class Parser: CompilerComponentProtocol {
         
         //consume "=="
         self.CST.addLeaf((tokenManager.peekNextToken()?.value)!)
+        self.AST.children.removeFirst()
+        self.AST = self.AST.addNode((tokenManager.peekNextToken()?.value)!)
+        self.AST.addLeaf(left)
         if !matchAndConsume(TokenType.BOOLOP, token: tokenManager.peekNextToken()){
             return false
         }
@@ -320,11 +360,13 @@ class Parser: CompilerComponentProtocol {
             return false
         }
         
+        //consume ")"
         self.CST.addLeaf((tokenManager.peekNextToken()?.value)!)
         if !matchAndConsume(TokenType.RPAREN, token: tokenManager.peekNextToken()){
             return false
         }
         
+        self.AST = self.AST.parent!
         self.CST = self.CST.parent!
         return true
     }
@@ -334,11 +376,13 @@ class Parser: CompilerComponentProtocol {
         
         let token = tokenManager.peekNextToken()
         
+        //printing number or math
         if token!.isType(TokenType.DIGIT) {
             let result = parseIntExpr()
             self.CST = self.CST.parent!
             return result
         }
+        //printing string
         else if token!.isType(TokenType.STRING) {
             self.CST = self.CST.addNode("String Expression")
             if !parseCharList() {
@@ -347,15 +391,20 @@ class Parser: CompilerComponentProtocol {
             self.CST = self.CST.parent!
             return true
         }
+        //printing var
         else if token!.isType(TokenType.CHAR) {
             let charVal = tokenManager.peekNextToken()?.value
             if !matchAndConsume(TokenType.CHAR, token: tokenManager.peekNextToken()){
                 return false
             }
+            self.AST.addLeaf(charVal!)
             self.CST.addLeaf(charVal!)
+            //self.AST = self.AST.parent!
+
             self.CST = self.CST.parent!
             return true
         }
+        //printing bool expr
         else if token!.isType(TokenType.LPAREN) || token!.isType(TokenType.BOOLVAL) {
             let result = parseBoolExpr()
             self.CST = self.CST.parent!
@@ -374,6 +423,8 @@ class Parser: CompilerComponentProtocol {
         self.CST = self.CST.addNode("Char List")
         
         var string = tokenManager.peekNextToken()?.value
+        self.AST.addLeaf(string!)
+
         //remove quotes ( " ) from strnig
         string = String(string!.characters.dropLast())
         string = String(string!.characters.dropFirst())
@@ -382,9 +433,11 @@ class Parser: CompilerComponentProtocol {
             return false
         }
         
+
         //handle empty string
         if string! == "" {
             self.CST.addLeaf("")
+            //self.AST.addLeaf("")
             self.CST.addLeaf("Char List")
             self.CST = self.CST.parent!
         } else {
@@ -425,8 +478,11 @@ class Parser: CompilerComponentProtocol {
         debug.log("parseIntExpr()", caller: self)
        self.CST = self.CST.addNode("Int Expression")
         
+        //check if this is an expression or just a digit
+        var digit: String = "ERROR"
         if tokenManager.peekNextToken()?.type == TokenType.DIGIT {
-            CST.addLeaf((tokenManager.peekNextToken()?.value)!)
+            digit = (tokenManager.peekNextToken()?.value)!
+            CST.addLeaf(digit)
             if !matchAndConsume(TokenType.DIGIT, token: tokenManager.peekNextToken()){
                 return false
             }
@@ -434,6 +490,8 @@ class Parser: CompilerComponentProtocol {
         
         if tokenManager.peekNextToken()!.isType(TokenType.INTOP) {
             CST.addLeaf((tokenManager.peekNextToken()?.value)!)
+            self.AST = AST.addNode((tokenManager.peekNextToken()?.value)!)
+            AST.addLeaf(digit)
             if !matchAndConsume(TokenType.INTOP, token: tokenManager.peekNextToken()){
                 return false
             }
@@ -441,7 +499,10 @@ class Parser: CompilerComponentProtocol {
             if !parseExpr(){
                 return false
             }
+            self.AST = self.AST.parent!
            
+        }else {
+            AST.addLeaf(digit)
         }
         self.CST = self.CST.parent!
 
