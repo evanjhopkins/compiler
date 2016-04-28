@@ -101,7 +101,7 @@ class Scope {
             let name = stringFill(k, size: 5)
             let type = stringFill(v.type, size: 8)
             let line = stringFill(String(v.line), size: 4)
-            let depth = stringFill(String(depth), size: 5)
+            let depth = stringFill(String(depth-1), size: 5)
             print(name + " " + type + " " + line + " " + depth)
         }
         for child in self.children {
