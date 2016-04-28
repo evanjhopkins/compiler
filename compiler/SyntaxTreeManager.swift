@@ -16,20 +16,23 @@ class SyntaxTreeManager: CompilerComponentProtocol  {
     
     init() {
         //allow init to be empty, detect no value rather than add child
-        self.AST = SyntaxTreeNode(value: "< Program >", isLeaf: false)
+        self.AST = SyntaxTreeNode()
         self.scope = Scope()
         self.varUsage = [:]
     }
     
-    func analyze(CST: SyntaxTreeNode) -> Bool {
+    func analyze(AST: SyntaxTreeNode) -> Bool {
         debug.affirm("Analyzing...", caller: self)
         //TODO: handle failure detections on these steps
-        debug.log("Building AST", caller: self)
-        self.AST = buildASTr(CST)!
-        condenseStatementLists()
-        
-        debug.log("Building symbol table", caller: self)
 
+        
+        //debug.log("Building AST", caller: self)
+        //self.AST = buildASTr(CST)!
+        //condenseStatementLists()
+        
+        self.AST = AST
+        debug.log("Building symbol table", caller: self)
+        
         if !buildSymbolTable(self.AST) {
             debug.error("Analysis failed", caller: self)
             return false
@@ -45,21 +48,12 @@ class SyntaxTreeManager: CompilerComponentProtocol  {
     func checkVariableUsage() {
         for (k,v) in self.varUsage {
             if v == "declared" {
-                debug.error("Variable '" + k + "' declared but never assigned", caller: self)
+                debug.error("(warn) Variable '" + k + "' declared but never assigned", caller: self)
             }else if (v == "assigned") {
-                debug.error("Variable '" + k + "' assigned but never used", caller: self)
+                debug.error("(warn) Variable '" + k + "' assigned but never used", caller: self)
             }
         }
     }
-    
-    func buildAST(CST: SyntaxTreeNode) -> SyntaxTreeNode? {
-        self.AST = buildASTr(CST)!
-        condenseStatementLists()
-        buildSymbolTable(self.AST)
-        self.scope.display()
-        return self.AST
-    }
-    
     
     //build a tree of symbol tables representing the scopes of variables
     func buildSymbolTable(node: SyntaxTreeNode) -> Bool {
@@ -74,20 +68,26 @@ class SyntaxTreeManager: CompilerComponentProtocol  {
             self.scope = self.scope.parent!
         } else if (node.value == "Variable Declaration"){
             //make sure this is not a redeclaration
-            if self.scope.immediateScopeCheck(node.children[1].value) {
-                debug.error("Variable '" + node.children[1].value + "' was already declared", caller: self)
+            if self.scope.immediateScopeCheck(node.children[1].value!) {
+                debug.error("Variable '" + node.children[1].value! + "' was already declared", caller: self)
                 return false
             }
             //set this variable to the declared stage
-            self.varUsage[node.children[1].value] = "declared"
+            self.varUsage[node.children[1].value!] = "declared"
             let type = node.children[0].value
             let name = node.children[1].value
             //add it to current scope
-            self.scope.addSymbol(name, type: type, line: 0)
+            self.scope.addSymbol(name!, type: type!, line: 0)
         } else if (node.value == "Assignment Statement") {
+            
             //is the variable in scope?
-            if !self.scope.scopeCheck(node.children[0].value) {
-                debug.error("Variable '" + node.children[0].value + "' was used before being declared" , caller: self)
+            if !self.scope.scopeCheck(node.children[0].value!) {
+                debug.error("Variable '" + node.children[0].value! + "' was used before being declared" , caller: self)
+                //user never declared var, lets do it for them
+                self.varUsage[node.children[1].value!] = "declared"
+                let name = node.children[0].value
+                let type: TokenType = valType(node.children[1])!
+                self.scope.addSymbol(name!, type: tokenTypeToScopeType(type), line: 0)
                 return false
             }
 
@@ -97,29 +97,33 @@ class SyntaxTreeManager: CompilerComponentProtocol  {
             }
             
             //set the variable to the assigned stage
-            self.varUsage[node.children[0].value] = "assigned"
+            self.varUsage[node.children[0].value!] = "assigned"
 
         } else if(node.value == "Print Statement") {
             //is this a raw value or var?
-            if (node.children[0].value.rangeOfString("[a-z]", options: .RegularExpressionSearch) == node.children[0].value.characters.indices) {
+            if (node.children[0].value!.rangeOfString("[a-z]", options: .RegularExpressionSearch) == node.children[0].value!.characters.indices) {
                 //is variable in scope?
-                if !self.scope.scopeCheck(node.children[0].value) {
-                    debug.error("Variable '" + node.children[0].value + "' was used before being declared" , caller: self)
+                if !self.scope.scopeCheck(node.children[0].value!) {
+                    debug.error("(warn) Variable '" + node.children[0].value! + "' was used before being declared" , caller: self)
                 }
                 //set the variable to the used (final) stage
-                self.varUsage[node.children[0].value] = "used"
+                self.varUsage[node.children[0].value!] = "used"
             }else {
                 //raw value
             }
         } else if(node.value == "Boolean Expression") {
             if node.children[1].value == "==" {
-                if !exprTypeCheck(node){
+                if !typeCheck(node){
                     return false
                 }
             }
             //let left = node.children[0]
             
-        } else{
+        } else if(node.value == "==" || node.value == "+") {
+            if !typeCheck(node) {
+                return false
+            }
+        }else{
             //if not a special case, do nothing and iterate over children
             for child in node.children {
                 if !buildSymbolTable(child) {
@@ -129,29 +133,46 @@ class SyntaxTreeManager: CompilerComponentProtocol  {
         }
         return true
     }
-
-    func exprTypeCheck(node: SyntaxTreeNode) -> Bool {
-        let leftType = valType(node.children[0].value)
-        let rightType = valType(node.children[2].value)
-
-        if leftType == rightType{
-            return true
+    
+    func tokenTypeToScopeType(type: TokenType) -> String {
+        if type == TokenType.STRING {
+            return "String"
+        } else if type == TokenType.BOOLVAL {
+            return "Boolean"
+        } else if type == TokenType.DIGIT {
+            return "Int"
+        } else {
+            return "ERROR"
         }
-        debug.error("Type mismatch, '" + node.children[0].value + "' not type compatable with '" + node.children[2].value+"'", caller: self)
-        return false
     }
     
     //confirm the action being conducted by node obeys type restrictions
     func typeCheck(node: SyntaxTreeNode) -> Bool {
-        let symbol = self.scope.getSymbol(node.children[0].value)
-        let idTypex = idType((symbol?.type)!)
-        let valueTypex = valType(node.children[1].value)
+        //node should be ==, +, assignment statement
+        let left = node.children[0]
+        let right = node.children[1]
         
-        if (idTypex != valueTypex) {
-            debug.error("Type mismatch, '" + node.children[1].value + "' is not of type " + idTypex!.rawValue, caller: self)
-            return false
+        if left.value=="+" {
+            return typeCheck(left)
         }
-        return true
+        if right.value=="+" {
+            return typeCheck(right)
+        }
+        
+        if node.value == "Assignment Statement" {
+            let typeInScope = idType(self.scope.getSymbol(left.value!)!.type)
+            let typeOfAsignee = valType(right)
+            if (typeInScope == typeOfAsignee) {
+                return true
+            }
+            
+        } else if (node.value == "==" || node.value == "+") {
+            if (valType(left) == valType(right)) {
+                return true
+            }
+        }
+        debug.error("Type-check failed, cannot compare '"+left.value!+"'("+String(valType(left))+") to '"+right.value!+"'", caller: self)
+        return false
     }
     
     //extract type from AST node names
@@ -171,15 +192,23 @@ class SyntaxTreeManager: CompilerComponentProtocol  {
     
     //re-lex type of leaf
     //TODO: this is a workaround for now, eventually the tree nodes will store type
-    func valType(value: String) -> TokenType? {
+    
+    func valType(node: SyntaxTreeNode) -> TokenType? {
+        let value = node.value!
+        
+        
         let patterns:[(type: TokenType, pattern: String)] = [
             (TokenType.DIGIT, "[0-9]"),
             (TokenType.BOOLVAL, "true|false"),
-            (TokenType.STRING, "[a-zA-Z0-9 ]*")
+            (TokenType.CHAR, "[a-z]"),
+            (TokenType.STRING, "\"[a-zA-Z0-9 ]*\"")
         ]
         
         for pattern in patterns {
             if value.rangeOfString(pattern.pattern, options: .RegularExpressionSearch) == value.characters.indices {
+                if pattern.type == TokenType.CHAR {
+                    return idType(self.scope.getSymbol(value)!.type)
+                }
                 return pattern.type
             }
         }
@@ -213,7 +242,7 @@ class SyntaxTreeManager: CompilerComponentProtocol  {
     
     //recursive part of buidling ast
     func buildASTr(CST: SyntaxTreeNode) -> SyntaxTreeNode? {
-        let astNode = SyntaxTreeNode(value: CST.value, isLeaf: CST.isLeaf)
+        var astNode = SyntaxTreeNode(value: CST.value!)
         
         if CST.children.count == 1 {
             return buildASTr(CST.children.first!)
@@ -258,8 +287,38 @@ class SyntaxTreeManager: CompilerComponentProtocol  {
             if CST.value == "Print Statement" {
                 let val = astNode.children[1].value
                 astNode.children = []
-                astNode.addLeaf(val)
+                astNode.addLeaf(val!)
             }
+            
+            if CST.value == "Int Expression" {
+                if (CST.children.count > 2) {
+                    astNode = handleIntExpr(CST)
+                }
+            }
+        }
+        
+        return astNode
+    }
+    
+    private func handleIntExpr(CST: SyntaxTreeNode) -> SyntaxTreeNode {
+        if CST.children.count == 1 {
+            return handleIntExpr(CST.children[0])
+        }
+        if CST.children.count == 0 {
+            return CST
+        }
+        
+        let astNode = SyntaxTreeNode(value: CST.children[1].value!)
+        
+        if (valType(CST.children[0]) == TokenType.DIGIT){
+            astNode.addLeaf(CST.children[0].value!)
+        }else{
+            astNode.children.append(handleIntExpr(CST.children[0]))
+        }
+        if (valType(CST.children[2]) == TokenType.DIGIT){
+            astNode.addLeaf(CST.children[2].value!)
+        }else{
+            astNode.children.append(handleIntExpr(CST.children[2]))
         }
         
         return astNode
@@ -268,7 +327,7 @@ class SyntaxTreeManager: CompilerComponentProtocol  {
     //recusive func to rebuild string from char list chains
     private func buildString(charList: SyntaxTreeNode) -> String {
         if charList.children.count == 2 {
-            return charList.children[0].value + buildString(charList.children[1])
+            return charList.children[0].value! + buildString(charList.children[1])
         }
         return ""
     }
