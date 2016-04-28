@@ -21,16 +21,54 @@
 	print(b) 
 }$
 
-{ int b b = "word"	}$
 
-{a = 1}$
+	{ int b b = "word"	}$
+
+	{a = 1}$
+
+{print(5+true)}$
+
+	{ if(true == false) { print(5) } }$
+
+	{int a a = 5 + true}$
+
+	{ if(true == 5) { print(5) } }$
+
+	{ if(true == false) { print(5) } }$
+
+
+	{ if(true) {print(5)} }$ 
+
+	{ if(5 == 5) { print(5) } }$
+
+	{int a a = 1 + 2}$
+
+	{ while(true) { print("loop")} }$
 
 { int a a = false }$
 
 {int a int a print(a)}$
 
-{int a int b b = 5 print(b)}$
+	{int a int b b = 5 print(b)}$
 
-{int a a = 5 int b b = 2 print(b)}$
+	{int a a = 5 int b b = 2 print(b)}$
 
 {int b b = 5 string x x = "word" {print(b+a)}}$
+
+	{ print("") {} int a a = 0 a = 3 + a int b b = 8 { { print ("inta is not int a") print (1+2+3+4+5+4+3+2+1) print (a) } int a a = 7 string b b = "one string" print(b)}}$
+
+	{int a}$
+
+	{string b b = "one string"}$
+
+	{int a a = 5}$
+
+	{print("ayyy") {}}$
+
+	{print("hello")}$
+
+	{print("")}$
+
+	{print (1+2+3) }$
+
+{print ((5+2)+(2+3))}$
