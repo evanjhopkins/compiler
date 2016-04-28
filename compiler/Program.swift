@@ -31,14 +31,13 @@ class Program: CompilerComponentProtocol {
         
         if lex() {
             if parse(self.lexer.getTokens()) {
-                let CST = parser.CST
-                if analyze(CST) {
+                if analyze(parser.AST) {
                     debug.affirm("Compile succeeded", caller: self)
                     if debug.verbose {
                         print("\nCST")
-                        CST.display()
+                        parser.CST.display()
                         print("\nAST")
-                        analyzer.AST.display()
+                        parser.AST.display()
                         analyzer.scope.display()
                     }
                     print("----------------------------------------------------------------------")
@@ -46,6 +45,7 @@ class Program: CompilerComponentProtocol {
                 }
             }
         }
+        //parser.AST.display()
         debug.error("Compile failed", caller: self)
         print("----------------------------------------------------------------------")
     }
