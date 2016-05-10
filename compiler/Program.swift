@@ -17,6 +17,7 @@ class Program: CompilerComponentProtocol {
     let lexer: Lexer
     let parser: Parser
     let analyzer: SyntaxTreeManager
+    let code: Code
     
     init(source: String, programId: String) {
         self.source = source
@@ -24,6 +25,7 @@ class Program: CompilerComponentProtocol {
         self.lexer = Lexer()
         self.parser = Parser()
         self.analyzer = SyntaxTreeManager()
+        self.code = Code()
     }
     
     func compile() {
@@ -33,6 +35,9 @@ class Program: CompilerComponentProtocol {
             if parse(self.lexer.getTokens()) {
                 if analyze(parser.AST) {
                     debug.affirm("Compile succeeded", caller: self)
+                    let out = code.generateCode(parser.AST)
+                    
+                    
                     if debug.verbose {
                         print("\nCST")
                         parser.CST.display()
@@ -40,6 +45,7 @@ class Program: CompilerComponentProtocol {
                         parser.AST.display()
                         analyzer.scope.display()
                     }
+                    print(out)
                     print("----------------------------------------------------------------------")
                     return
                 }
