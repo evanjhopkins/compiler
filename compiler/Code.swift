@@ -155,9 +155,6 @@ class Code {
         
         //handle raw string
         if varId.characters.first == "\"" {
-            //drop quotes
-//            varId = String(varId.characters.dropFirst())
-//            varId = String(varId.characters.dropLast())
             
             let simulatedNode = SyntaxTreeNode()
             simulatedNode.addLeaf("@")
@@ -167,6 +164,15 @@ class Code {
             self.dataTable[tempId] = DataRecord(tempId: tempId, varId: "@", addr: self.dataTable.count+1 , scope: self.scope, type: "string")
             handleAssignmentStatement(simulatedNode)
             
+            varId = "@"
+        }else if "1234567890".rangeOfString(varId) != nil {//handle raw number
+            let simulatedNode = SyntaxTreeNode()
+            simulatedNode.addLeaf("@")
+            simulatedNode.addLeaf(varId)
+            //add mem entry
+            let tempId = getNewTempId()
+            self.dataTable[tempId] = DataRecord(tempId: tempId, varId: "@", addr: self.dataTable.count+1 , scope: self.scope, type: "int")
+            handleAssignmentStatement(simulatedNode)
             varId = "@"
         }
         
