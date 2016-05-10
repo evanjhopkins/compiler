@@ -154,15 +154,15 @@ class Code {
         var varId = ast.children[0].value!
         
         //handle raw string
-        if varId.characters.first == "\"" || "1234567890".rangeOfString(varId) != nil {
+        if varId.characters.first == "\"" || "1234567890".rangeOfString(varId) != nil || varId=="false" || varId=="true"{
             
             let simulatedNode = SyntaxTreeNode()
             simulatedNode.addLeaf("@")
             simulatedNode.addLeaf(varId)
             //add mem entry
             let tempId = getNewTempId()
-            let type = varId.characters.first == "\"" ? "string":"int"
-  
+            let type = varId.characters.first == "\"" ? "string":(varId=="false"||varId=="true") ? "boolean":"int"
+            
             self.dataTable[tempId] = DataRecord(tempId: tempId, varId: "@", addr: self.dataTable.count+1 , scope: self.scope, type: type)
             handleAssignmentStatement(simulatedNode)
             
