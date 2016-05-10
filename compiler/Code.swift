@@ -45,7 +45,6 @@ class Code {
     
     func generateCode(ast: SyntaxTreeNode) -> String {
         routeNode(ast)
-        print(self.code)
         backpatch()
         self.code += "00"
         
@@ -110,6 +109,11 @@ class Code {
     }
     
     func handleAssignmentStatement(ast: SyntaxTreeNode) {
+//        if !ast.children[1].isLeaf {
+//            var value = resolveIntExpr(ast)
+//        }
+        
+        
         var code = "A9"
         let varId = ast.children[0].value!
         var value = ast.children[1].value!
@@ -118,7 +122,7 @@ class Code {
         }else if value=="false"{
             value = String(0)
         }
-        let dataRecord = getDataRecordForVarId(varId)!
+        let dataRecord = getDataRecordForVarId(varId, scope: self.scope)!
 
         if dataRecord.type=="string" {
             //remove quotes from beginning and end of string
@@ -150,7 +154,7 @@ class Code {
         let varId = ast.children[0].value!
         
         //load Y register with contents of A, TX 00
-        let dataRecord = getDataRecordForVarId(varId)!
+        let dataRecord = getDataRecordForVarId(varId, scope: self.scope)!
         code += dataRecord.tempId
         
         code += "A2"
@@ -168,11 +172,14 @@ class Code {
         return strNum
     }
     
-    func getDataRecordForVarId(varId: String) -> DataRecord? {
+    func getDataRecordForVarId(varId: String, scope: Int) -> DataRecord? {
         for rec in self.dataTable {
-            if rec.1.varId==varId && rec.1.scope==self.scope{
+            if rec.1.varId==varId && rec.1.scope==scope{
                 return rec.1
             }
+        }
+        if scope > 0 {
+            return getDataRecordForVarId(varId, scope: scope-1)
         }
         print("ERROR GETTING DATA RECORD")
         return nil
