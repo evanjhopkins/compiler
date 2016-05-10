@@ -151,7 +151,24 @@ class Code {
     func handlePrintStatement(ast: SyntaxTreeNode) {
         var code = "AC"
         
-        let varId = ast.children[0].value!
+        var varId = ast.children[0].value!
+        
+        //handle raw string
+        if varId.characters.first == "\"" {
+            //drop quotes
+//            varId = String(varId.characters.dropFirst())
+//            varId = String(varId.characters.dropLast())
+            
+            let simulatedNode = SyntaxTreeNode()
+            simulatedNode.addLeaf("@")
+            simulatedNode.addLeaf(varId)
+            //add mem entry
+            let tempId = getNewTempId()
+            self.dataTable[tempId] = DataRecord(tempId: tempId, varId: "@", addr: self.dataTable.count+1 , scope: self.scope, type: "string")
+            handleAssignmentStatement(simulatedNode)
+            
+            varId = "@"
+        }
         
         //load Y register with contents of A, TX 00
         let dataRecord = getDataRecordForVarId(varId, scope: self.scope)!
