@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		730DB3871CC5A5C700F4F410 /* Scope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 730DB3861CC5A5C700F4F410 /* Scope.swift */; };
+		732BC8491CE0EA39000F7D2E /* Code.swift in Sources */ = {isa = PBXBuildFile; fileRef = 732BC8481CE0EA39000F7D2E /* Code.swift */; };
 		734C38C01CC05EBF00380A26 /* SyntaxTreeNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 734C38BF1CC05EBF00380A26 /* SyntaxTreeNode.swift */; };
 		734C38C21CC07E8800380A26 /* SyntaxTreeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 734C38C11CC07E8800380A26 /* SyntaxTreeManager.swift */; };
 		73A763121CAD7586005DC413 /* Program.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73A763111CAD7586005DC413 /* Program.swift */; };
@@ -35,6 +36,7 @@
 
 /* Begin PBXFileReference section */
 		730DB3861CC5A5C700F4F410 /* Scope.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Scope.swift; sourceTree = "<group>"; };
+		732BC8481CE0EA39000F7D2E /* Code.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Code.swift; sourceTree = "<group>"; };
 		734C38BF1CC05EBF00380A26 /* SyntaxTreeNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyntaxTreeNode.swift; sourceTree = "<group>"; };
 		734C38C11CC07E8800380A26 /* SyntaxTreeManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyntaxTreeManager.swift; sourceTree = "<group>"; };
 		73A763111CAD7586005DC413 /* Program.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Program.swift; sourceTree = "<group>"; };
@@ -91,6 +93,7 @@
 				734C38BF1CC05EBF00380A26 /* SyntaxTreeNode.swift */,
 				734C38C11CC07E8800380A26 /* SyntaxTreeManager.swift */,
 				730DB3861CC5A5C700F4F410 /* Scope.swift */,
+				732BC8481CE0EA39000F7D2E /* Code.swift */,
 			);
 			path = compiler;
 			sourceTree = "<group>";
@@ -161,6 +164,7 @@
 				E1D0886F1C7F8ED9003430E7 /* SwiftyJSON.swift in Sources */,
 				E1D088621C7D2744003430E7 /* Token.swift in Sources */,
 				73A763121CAD7586005DC413 /* Program.swift in Sources */,
+				732BC8491CE0EA39000F7D2E /* Code.swift in Sources */,
 				E1D088641C7E6B0D003430E7 /* Lexer.swift in Sources */,
 				E122B6961C5A7563007E3273 /* main.swift in Sources */,
 				E1D0886D1C7EBF17003430E7 /* TokenManager.swift in Sources */,
